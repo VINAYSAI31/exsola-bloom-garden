@@ -31,7 +31,7 @@ const featuredProducts = [
     id: "3",
     name: "Oyster Mushrooms",
     price: 10.99,
-    image: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=500&h=500&fit=crop",
+    image: "",
     description: "Delicate oyster mushrooms with a mild, sweet taste",
   },
   {

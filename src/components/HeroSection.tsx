@@ -1,16 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import heroImage from "@/assets/hero-mushrooms.jpg";
+import heroImage from "@/assets/slider-1.jpg";
+import mushroomImage from "@/assets/mushroom1.png"; // Mushroom image
 
 const HeroSection = () => {
   return (
-    <section className="relative h-[600px] flex items-center justify-start overflow-hidden">
+    <section className="relative h-[600px] flex items-center justify-start overflow-visible">
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/10 to-transparent" />
       </div>
 
       {/* Content */}
@@ -29,6 +30,13 @@ const HeroSection = () => {
           </Link>
         </div>
       </div>
+
+      {/* Mushroom Image overlapping Featured Section */}
+      <img 
+        src={mushroomImage} 
+        alt="Mushroom" 
+        className="absolute bottom-[-59px] right-0 w-48 md:w-64 lg:w-80 z-20 pointer-events-none"
+      />
     </section>
   );
 };

@@ -104,13 +104,13 @@ const HealthBenefits = () => {
             data-aos="zoom-in"
             data-aos-delay="200"
           >
-            <div className="w-80 h-80 rounded-full overflow-hidden shadow-accent bg-background p-8">
+            {/* <div className="w-80 h-80 rounded-full overflow-hidden shadow-accent bg-background p-8">
               <img 
                 src={healthImage} 
                 alt="Mushrooms" 
                 className="w-full h-full object-cover rounded-full"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
