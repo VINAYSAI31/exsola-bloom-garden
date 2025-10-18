@@ -1,78 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-
-// Mock product data
-const allProducts = [
-  {
-    id: "1",
-    name: "Organic Button Mushrooms",
-    price: 8.99,
-    image: "https://images.unsplash.com/photo-1568471173230-b71caaa0d18f?w=500&h=500&fit=crop",
-    description: "Fresh, organic button mushrooms perfect for any dish",
-  },
-  {
-    id: "2",
-    name: "Shiitake Mushrooms",
-    price: 12.99,
-    image: "https://images.unsplash.com/photo-1561507930-9ffffdfa8e9b?w=500&h=500&fit=crop",
-    description: "Premium shiitake mushrooms with rich, savory flavor",
-  },
-  {
-    id: "3",
-    name: "Oyster Mushrooms",
-    price: 10.99,
-    image: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=500&h=500&fit=crop",
-    description: "Delicate oyster mushrooms with a mild, sweet taste",
-  },
-  {
-    id: "4",
-    name: "Portobello Mushrooms",
-    price: 9.99,
-    image: "https://images.unsplash.com/photo-1583697013014-a0b8b64d64b3?w=500&h=500&fit=crop",
-    description: "Large, meaty portobello mushrooms ideal for grilling",
-  },
-  {
-    id: "5",
-    name: "Enoki Mushrooms",
-    price: 7.99,
-    image: "https://images.unsplash.com/photo-1598853721148-22c5f5041f4d?w=500&h=500&fit=crop",
-    description: "Delicate enoki mushrooms with a crisp texture",
-  },
-  {
-    id: "6",
-    name: "King Oyster Mushrooms",
-    price: 14.99,
-    image: "https://images.unsplash.com/photo-1585770038403-dd94bf5e7e8c?w=500&h=500&fit=crop",
-    description: "Premium king oyster mushrooms with meaty texture",
-  },
-  {
-    id: "7",
-    name: "Lion's Mane Mushrooms",
-    price: 16.99,
-    image: "https://images.unsplash.com/photo-1635098818539-a84d1d9cdc3a?w=500&h=500&fit=crop",
-    description: "Exotic lion's mane mushrooms with unique flavor",
-  },
-  {
-    id: "8",
-    name: "Maitake Mushrooms",
-    price: 13.99,
-    image: "https://images.unsplash.com/photo-1581953280962-8d82992e3160?w=500&h=500&fit=crop",
-    description: "Flavorful maitake mushrooms, also known as hen of the woods",
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 const Products = () => {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     AOS.init({
       duration: 800,
       once: true,
       easing: "ease-out",
     });
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("in_stock", true)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setProducts(data);
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -93,11 +52,28 @@ const Products = () => {
         {/* Products Grid */}
         <section className="py-16 bg-card">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {allProducts.map((product) => (
-                <ProductCard key={product.id} {...product} />
-              ))}
-            </div>
+            {loading ? (
+              <div className="flex justify-center items-center min-h-[400px]">
+                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+              </div>
+            ) : products.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-lg text-muted-foreground">No products available at the moment.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {products.map((product) => (
+                  <ProductCard 
+                    key={product.id} 
+                    id={product.id}
+                    name={product.name}
+                    price={product.price}
+                    image={product.image_url}
+                    description={product.description}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </main>

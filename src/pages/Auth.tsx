@@ -29,7 +29,7 @@ const Auth = () => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -43,11 +43,24 @@ const Auth = () => {
         variant: "destructive",
       });
     } else {
+      // Check user role
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+
       toast({
         title: "Success",
         description: "Welcome back!",
       });
-      navigate("/");
+
+      // Redirect based on role
+      if (roleData?.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/products");
+      }
     }
   };
 

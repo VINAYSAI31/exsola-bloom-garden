@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, MapPin, Package, Settings } from "lucide-react";
+import { User, MapPin, Package, Settings, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
@@ -29,43 +29,38 @@ const Profile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    checkAuthAndFetchProfile();
+    checkUser();
   }, []);
 
-  const checkAuthAndFetchProfile = async () => {
+  const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      navigate("/auth");
-      return;
+    setUser(session?.user || null);
+    if (session?.user) {
+      fetchProfile(session.user.id);
+      fetchOrders(session.user.id);
+    } else {
+      setLoading(false);
     }
-
-    fetchProfile();
-    fetchOrders();
   };
 
-  const fetchProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (user) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
 
-      if (!error && data) {
-        setProfile(data);
-      }
+    if (!error && data) {
+      setProfile(data);
     }
     setLoading(false);
   };
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (userId: string) => {
     const { data, error } = await supabase
       .from("orders")
       .select(`
@@ -75,6 +70,7 @@ const Profile = () => {
         total,
         order_items (quantity)
       `)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
     if (!error && data) {
@@ -86,8 +82,7 @@ const Profile = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user?.id) return;
 
     const { error } = await supabase
       .from("profiles")
@@ -108,21 +103,9 @@ const Profile = () => {
         title: "Success",
         description: "Profile updated successfully",
       });
-      fetchProfile();
+      fetchProfile(user.id);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <p>Loading...</p>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -131,7 +114,28 @@ const Profile = () => {
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-4xl font-bold mb-8">My Account</h1>
 
-          <Tabs defaultValue="profile" className="space-y-6">
+          {!user ? (
+            <Card className="p-12 text-center">
+              <User className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <h2 className="text-2xl font-semibold mb-2">Profile Access Required</h2>
+              <p className="text-muted-foreground mb-6">
+                Sign in to your account or create a new account to view and manage your profile
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Button asChild className="bg-accent hover:bg-accent/90">
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to="/products">Browse Products</Link>
+                </Button>
+              </div>
+            </Card>
+          ) : loading ? (
+            <div className="flex justify-center items-center min-h-[400px]">
+              <Loader2 className="h-8 w-8 animate-spin text-accent" />
+            </div>
+          ) : (
+            <Tabs defaultValue="profile" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="profile">
                 <User className="h-4 w-4 mr-2" />
@@ -279,9 +283,10 @@ const Profile = () => {
                   </div>
                   <Button className="bg-accent hover:bg-accent/90">Update Password</Button>
                 </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          )}
         </div>
       </main>
       <Footer />

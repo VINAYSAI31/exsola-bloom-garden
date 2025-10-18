@@ -83,18 +83,16 @@ const Navbar = () => {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            {user && (
-              <Link to="/cart">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="h-5 w-5" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-            )}
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
             
             {user ? (
               <DropdownMenu>

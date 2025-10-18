@@ -2,8 +2,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Minus, Plus, Trash2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Minus, Plus, Trash2, ShoppingCart, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -22,25 +22,24 @@ interface CartItem {
 const Cart = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    checkAuthAndFetchCart();
+    checkUser();
   }, []);
 
-  const checkAuthAndFetchCart = async () => {
+  const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      navigate("/auth");
-      return;
+    setUser(session?.user || null);
+    if (session?.user) {
+      fetchCart(session.user.id);
+    } else {
+      setLoading(false);
     }
-
-    fetchCart();
   };
 
-  const fetchCart = async () => {
+  const fetchCart = async (userId: string) => {
     const { data, error } = await supabase
       .from("cart_items")
       .select(`
@@ -52,7 +51,8 @@ const Cart = () => {
           price,
           image_url
         )
-      `);
+      `)
+      .eq("user_id", userId);
 
     if (error) {
       toast({
@@ -81,7 +81,7 @@ const Cart = () => {
         variant: "destructive",
       });
     } else {
-      fetchCart();
+      if (user?.id) fetchCart(user.id);
     }
   };
 
@@ -102,25 +102,13 @@ const Cart = () => {
         title: "Success",
         description: "Item removed from cart",
       });
-      fetchCart();
+      if (user?.id) fetchCart(user.id);
     }
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + Number(item.products.price) * item.quantity, 0);
   const shipping = cartItems.length > 0 ? 5.99 : 0;
   const total = subtotal + shipping;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <p>Loading...</p>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -129,10 +117,31 @@ const Cart = () => {
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
-              {cartItems.length === 0 ? (
+          {!user ? (
+            <Card className="p-12 text-center">
+              <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <h2 className="text-2xl font-semibold mb-2">Your cart is waiting</h2>
+              <p className="text-muted-foreground mb-6">
+                Sign in to your account or create a new account to start shopping
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Button asChild className="bg-accent hover:bg-accent/90">
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to="/products">Continue Shopping</Link>
+                </Button>
+              </div>
+            </Card>
+          ) : loading ? (
+            <div className="flex justify-center items-center min-h-[400px]">
+              <Loader2 className="h-8 w-8 animate-spin text-accent" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Cart Items */}
+              <div className="lg:col-span-2 space-y-4">
+                {cartItems.length === 0 ? (
                 <Card className="p-8 text-center">
                   <p className="text-muted-foreground mb-4">Your cart is empty</p>
                   <Link to="/products">
@@ -184,13 +193,13 @@ const Cart = () => {
                         </div>
                       </div>
                     </div>
-                  </Card>
-                ))
-              )}
-            </div>
+                    </Card>
+                  ))
+                )}
+              </div>
 
-            {/* Order Summary */}
-            <div>
+              {/* Order Summary */}
+              <div>
               <Card className="p-6 sticky top-24">
                 <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
                 
@@ -218,9 +227,10 @@ const Cart = () => {
                     Continue Shopping
                   </Button>
                 </Link>
-              </Card>
+                </Card>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
       <Footer />
