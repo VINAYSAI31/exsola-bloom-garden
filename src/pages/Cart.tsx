@@ -3,23 +3,124 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface CartItem {
+  id: string;
+  product_id: string;
+  quantity: number;
+  products: {
+    name: string;
+    price: number;
+    image_url: string;
+  };
+}
 
 const Cart = () => {
-  // Mock cart data
-  const cartItems = [
-    {
-      id: "1",
-      name: "Organic Button Mushrooms",
-      price: 8.99,
-      quantity: 2,
-      image: "https://images.unsplash.com/photo-1568471173230-b71caaa0d18f?w=200&h=200&fit=crop",
-    },
-  ];
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = 5.99;
+  useEffect(() => {
+    checkAuthAndFetchCart();
+  }, []);
+
+  const checkAuthAndFetchCart = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      navigate("/auth");
+      return;
+    }
+
+    fetchCart();
+  };
+
+  const fetchCart = async () => {
+    const { data, error } = await supabase
+      .from("cart_items")
+      .select(`
+        id,
+        product_id,
+        quantity,
+        products (
+          name,
+          price,
+          image_url
+        )
+      `);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load cart",
+        variant: "destructive",
+      });
+    } else {
+      setCartItems(data || []);
+    }
+    setLoading(false);
+  };
+
+  const updateQuantity = async (itemId: string, newQuantity: number) => {
+    if (newQuantity < 1) return;
+
+    const { error } = await supabase
+      .from("cart_items")
+      .update({ quantity: newQuantity })
+      .eq("id", itemId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update quantity",
+        variant: "destructive",
+      });
+    } else {
+      fetchCart();
+    }
+  };
+
+  const removeItem = async (itemId: string) => {
+    const { error } = await supabase
+      .from("cart_items")
+      .delete()
+      .eq("id", itemId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove item",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Item removed from cart",
+      });
+      fetchCart();
+    }
+  };
+
+  const subtotal = cartItems.reduce((sum, item) => sum + Number(item.products.price) * item.quantity, 0);
+  const shipping = cartItems.length > 0 ? 5.99 : 0;
   const total = subtotal + shipping;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <p>Loading...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -45,26 +146,39 @@ const Cart = () => {
                   <Card key={item.id} className="p-6">
                     <div className="flex gap-6">
                       <img 
-                        src={item.image} 
-                        alt={item.name} 
+                        src={item.products.image_url || "/placeholder.svg"} 
+                        alt={item.products.name} 
                         className="w-24 h-24 object-cover rounded"
                       />
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-2">{item.name}</h3>
-                        <p className="text-accent font-bold mb-4">${item.price.toFixed(2)}</p>
+                        <h3 className="font-semibold text-lg mb-2">{item.products.name}</h3>
+                        <p className="text-accent font-bold mb-4">${Number(item.products.price).toFixed(2)}</p>
                         
                         <div className="flex items-center justify-between">
                           <div className="flex items-center border rounded-lg">
-                            <Button variant="ghost" size="icon">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            >
                               <Minus className="h-4 w-4" />
                             </Button>
                             <span className="px-4 py-2 font-semibold">{item.quantity}</span>
-                            <Button variant="ghost" size="icon">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            >
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
                           
-                          <Button variant="ghost" size="icon" className="text-destructive">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-destructive"
+                            onClick={() => removeItem(item.id)}
+                          >
                             <Trash2 className="h-5 w-5" />
                           </Button>
                         </div>

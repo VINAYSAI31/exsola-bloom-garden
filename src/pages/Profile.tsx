@@ -6,24 +6,123 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, MapPin, Package, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+
+interface Profile {
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+}
+
+interface Order {
+  id: string;
+  created_at: string;
+  status: string;
+  total: number;
+  order_items: { quantity: number }[];
+}
 
 const Profile = () => {
-  const mockOrders = [
-    {
-      id: "ORD-001",
-      date: "2024-01-15",
-      status: "Delivered",
-      total: 45.97,
-      items: 3,
-    },
-    {
-      id: "ORD-002",
-      date: "2024-01-20",
-      status: "Processing",
-      total: 28.99,
-      items: 2,
-    },
-  ];
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    checkAuthAndFetchProfile();
+  }, []);
+
+  const checkAuthAndFetchProfile = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      navigate("/auth");
+      return;
+    }
+
+    fetchProfile();
+    fetchOrders();
+  };
+
+  const fetchProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (!error && data) {
+        setProfile(data);
+      }
+    }
+    setLoading(false);
+  };
+
+  const fetchOrders = async () => {
+    const { data, error } = await supabase
+      .from("orders")
+      .select(`
+        id,
+        created_at,
+        status,
+        total,
+        order_items (quantity)
+      `)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setOrders(data);
+    }
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        full_name: formData.get("fullName") as string,
+        phone: formData.get("phone") as string,
+      })
+      .eq("id", user.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+      fetchProfile();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <p>Loading...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -58,27 +157,38 @@ const Profile = () => {
                   <CardTitle>Personal Information</CardTitle>
                   <CardDescription>Update your personal details</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleUpdateProfile}>
+                  <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input id="firstName" defaultValue="John" />
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Input 
+                        id="fullName" 
+                        name="fullName"
+                        defaultValue={profile?.full_name || ""} 
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input id="lastName" defaultValue="Doe" />
+                      <Label htmlFor="email">Email</Label>
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        defaultValue={profile?.email || ""} 
+                        disabled 
+                      />
+                      <p className="text-sm text-muted-foreground">Email cannot be changed</p>
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" defaultValue="john.doe@example.com" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" type="tel" defaultValue="+1 (555) 123-4567" />
-                  </div>
-                  <Button className="bg-accent hover:bg-accent/90">Save Changes</Button>
-                </CardContent>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input 
+                        id="phone" 
+                        name="phone"
+                        type="tel" 
+                        defaultValue={profile?.phone || ""} 
+                      />
+                    </div>
+                    <Button type="submit" className="bg-accent hover:bg-accent/90">Save Changes</Button>
+                  </CardContent>
+                </form>
               </Card>
             </TabsContent>
 
@@ -112,32 +222,38 @@ const Profile = () => {
                   <CardDescription>View your past orders</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {mockOrders.map((order) => (
-                    <div key={order.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="font-semibold">Order {order.id}</p>
-                          <p className="text-sm text-muted-foreground">{order.date}</p>
-                          <p className="text-sm">
-                            <span className={`inline-block px-2 py-1 rounded text-xs ${
-                              order.status === "Delivered" 
-                                ? "bg-green-100 text-green-800" 
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}>
-                              {order.status}
-                            </span>
-                          </p>
+                  {orders.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">No orders yet</p>
+                  ) : (
+                    orders.map((order) => {
+                      const itemCount = order.order_items.reduce((sum, item) => sum + item.quantity, 0);
+                      return (
+                        <div key={order.id} className="border rounded-lg p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <p className="font-semibold">Order #{order.id.slice(0, 8)}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(order.created_at).toLocaleDateString()}
+                              </p>
+                              <p className="text-sm">
+                                <span className={`inline-block px-2 py-1 rounded text-xs ${
+                                  order.status === "delivered" 
+                                    ? "bg-green-100 text-green-800" 
+                                    : "bg-yellow-100 text-yellow-800"
+                                }`}>
+                                  {order.status}
+                                </span>
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-accent">${Number(order.total).toFixed(2)}</p>
+                              <p className="text-sm text-muted-foreground">{itemCount} items</p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold text-accent">${order.total.toFixed(2)}</p>
-                          <p className="text-sm text-muted-foreground">{order.items} items</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm" className="w-full mt-2">
-                        View Details
-                      </Button>
-                    </div>
-                  ))}
+                      );
+                    })
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
