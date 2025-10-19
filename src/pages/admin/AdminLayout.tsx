@@ -1,16 +1,36 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Package, 
   Users, 
   ShoppingCart, 
   Settings,
-  LogOut 
+  LogOut,
+  Home
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import Swal from "sweetalert2";
 
 const AdminLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: "Logout",
+      text: "Are you sure you want to logout?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, logout",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      await supabase.auth.signOut();
+      navigate("/");
+    }
+  };
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
@@ -52,13 +72,21 @@ const AdminLayout = () => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-primary-foreground/20">
+        <div className="p-4 border-t border-primary-foreground/20 space-y-2">
           <Link to="/">
             <Button variant="ghost" className="w-full justify-start text-primary-foreground hover:bg-primary-foreground/10">
-              <LogOut className="mr-3 h-5 w-5" />
+              <Home className="mr-3 h-5 w-5" />
               Back to Site
             </Button>
           </Link>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-primary-foreground hover:bg-primary-foreground/10"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-3 h-5 w-5" />
+            Logout
+          </Button>
         </div>
       </aside>
 
