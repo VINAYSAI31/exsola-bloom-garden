@@ -46,15 +46,15 @@ const AdminLayout = () => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-64 bg-primary text-primary-foreground flex flex-col">
+      {/* Sidebar - Fixed */}
+      <aside className="w-64 bg-primary text-primary-foreground flex flex-col fixed h-screen">
         <div className="p-6 border-b border-primary-foreground/20">
           <Link to="/">
             <h1 className="text-2xl font-bold">Exsola Admin</h1>
           </Link>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {menuItems.map((item) => (
             <Link key={item.path} to={item.path}>
               <Button
@@ -90,8 +90,8 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 bg-background overflow-auto">
+      {/* Main Content - with left margin to account for fixed sidebar */}
+      <main className="flex-1 bg-background ml-64 overflow-auto">
         <Outlet />
       </main>
     </div>

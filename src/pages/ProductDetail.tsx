@@ -1,46 +1,155 @@
-import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, ShoppingCart, ArrowLeft } from "lucide-react";
+import { Minus, Plus, ShoppingCart, ArrowLeft, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-
-// Mock product data - in real app, this would come from database
-const productDetails: Record<string, any> = {
-  "1": {
-    name: "Organic Button Mushrooms",
-    price: 8.99,
-    image: "https://images.unsplash.com/photo-1568471173230-b71caaa0d18f?w=800&h=800&fit=crop",
-    description: "Fresh, organic button mushrooms perfect for any dish",
-    longDescription: "Our organic button mushrooms are carefully cultivated using sustainable farming practices. These versatile mushrooms are perfect for salads, pasta, stir-fries, and more. Rich in nutrients and low in calories, they're an excellent addition to any healthy diet.",
-    stock: 45,
-    weight: "250g",
-    nutrition: {
-      calories: 22,
-      protein: "3g",
-      carbs: "3g",
-      fiber: "1g",
-    },
-  },
-};
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<any>(null);
+  const [images, setImages] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [isAdding, setIsAdding] = useState(false);
 
-  const product = productDetails[id || "1"] || productDetails["1"];
+  useEffect(() => {
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
+
+  const fetchProduct = async () => {
+    const { data: productData, error: productError } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (productError || !productData) {
+      toast({
+        title: "Error",
+        description: "Product not found",
+        variant: "destructive",
+      });
+      navigate("/products");
+      return;
+    }
+
+    setProduct(productData);
+
+    // Fetch product images
+    const { data: imageData } = await supabase
+      .from("product_images")
+      .select("image_url")
+      .eq("product_id", id)
+      .order("display_order", { ascending: true });
+
+    const productImages = imageData?.map(img => img.image_url) || [];
+    
+    // If no images in product_images table, use main image_url
+    if (productImages.length === 0 && productData.image_url) {
+      productImages.push(productData.image_url);
+    }
+
+    setImages(productImages);
+    setSelectedImage(productImages[0] || "");
+    setLoading(false);
+  };
 
   const handleQuantityChange = (delta: number) => {
-    setQuantity(Math.max(1, Math.min(product.stock, quantity + delta)));
+    if (!product) return;
+    setQuantity(Math.max(1, quantity + delta));
   };
+
+  const handleAddToCart = async () => {
+    setIsAdding(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Please sign in",
+        description: "You need to sign in to add items to cart",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      setIsAdding(false);
+      return;
+    }
+
+    const { data: existingItem } = await supabase
+      .from("cart_items")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .eq("product_id", id)
+      .maybeSingle();
+
+    if (existingItem) {
+      const { error } = await supabase
+        .from("cart_items")
+        .update({ quantity: existingItem.quantity + quantity })
+        .eq("id", existingItem.id);
+
+      if (!error) {
+        toast({
+          title: "Cart updated",
+          description: "Item quantity increased",
+        });
+      }
+    } else {
+      const { error } = await supabase
+        .from("cart_items")
+        .insert({
+          user_id: session.user.id,
+          product_id: id,
+          quantity: quantity,
+        });
+
+      if (!error) {
+        toast({
+          title: "Added to cart",
+          description: `${product.name} has been added to your cart`,
+        });
+      }
+    }
+    setIsAdding(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-accent" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-lg text-muted-foreground">Product not found</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
-          {/* Back Button */}
           <Link to="/products">
             <Button variant="ghost" className="mb-6">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -49,11 +158,33 @@ const ProductDetail = () => {
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Product Image */}
-            <div>
-              <Card className="overflow-hidden">
+            {/* Product Images - Amazon style vertical on left */}
+            <div className="flex gap-4">
+              {/* Thumbnail images vertical column */}
+              {images.length > 1 && (
+                <div className="flex flex-col gap-3 w-20">
+                  {images.map((img, idx) => (
+                    <Card 
+                      key={idx}
+                      className={`overflow-hidden cursor-pointer transition-all ${
+                        selectedImage === img ? "ring-2 ring-accent" : "opacity-60 hover:opacity-100"
+                      }`}
+                      onClick={() => setSelectedImage(img)}
+                    >
+                      <img 
+                        src={img} 
+                        alt={`${product.name} view ${idx + 1}`} 
+                        className="w-full h-20 object-cover"
+                      />
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Main image */}
+              <Card className="overflow-hidden flex-1">
                 <img 
-                  src={product.image} 
+                  src={selectedImage || images[0] || product.image_url} 
                   alt={product.name} 
                   className="w-full h-auto object-cover"
                 />
@@ -65,14 +196,16 @@ const ProductDetail = () => {
               <div>
                 <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
                 <p className="text-3xl font-bold text-accent mb-4">
-                  ${product.price.toFixed(2)}
+                  ₹{product.price.toFixed(2)}
                 </p>
-                <p className="text-muted-foreground mb-2">
-                  Weight: {product.weight}
-                </p>
+                {product.category && (
+                  <p className="text-muted-foreground mb-2">
+                    Category: {product.category}
+                  </p>
+                )}
                 <p className="text-muted-foreground">
-                  {product.stock > 0 ? (
-                    <span className="text-green-600">In Stock ({product.stock} available)</span>
+                  {product.in_stock ? (
+                    <span className="text-green-600">In Stock</span>
                   ) : (
                     <span className="text-red-600">Out of Stock</span>
                   )}
@@ -82,31 +215,8 @@ const ProductDetail = () => {
               <div className="border-t border-b py-6">
                 <h2 className="text-xl font-semibold mb-4">Description</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  {product.longDescription}
+                  {product.description}
                 </p>
-              </div>
-
-              {/* Nutrition Info */}
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Nutrition Facts (per 100g)</h2>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-muted p-3 rounded">
-                    <p className="text-muted-foreground">Calories</p>
-                    <p className="font-semibold">{product.nutrition.calories}</p>
-                  </div>
-                  <div className="bg-muted p-3 rounded">
-                    <p className="text-muted-foreground">Protein</p>
-                    <p className="font-semibold">{product.nutrition.protein}</p>
-                  </div>
-                  <div className="bg-muted p-3 rounded">
-                    <p className="text-muted-foreground">Carbs</p>
-                    <p className="font-semibold">{product.nutrition.carbs}</p>
-                  </div>
-                  <div className="bg-muted p-3 rounded">
-                    <p className="text-muted-foreground">Fiber</p>
-                    <p className="font-semibold">{product.nutrition.fiber}</p>
-                  </div>
-                </div>
               </div>
 
               {/* Quantity and Add to Cart */}
@@ -127,7 +237,6 @@ const ProductDetail = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleQuantityChange(1)}
-                      disabled={quantity >= product.stock}
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
@@ -137,10 +246,11 @@ const ProductDetail = () => {
                 <Button 
                   size="lg" 
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                  disabled={product.stock === 0}
+                  disabled={!product.in_stock || isAdding}
+                  onClick={handleAddToCart}
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" />
-                  Add to Cart - ${(product.price * quantity).toFixed(2)}
+                  {isAdding ? "Adding..." : `Add to Cart - ₹${(product.price * quantity).toFixed(2)}`}
                 </Button>
               </div>
             </div>
