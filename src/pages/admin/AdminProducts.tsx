@@ -27,6 +27,7 @@ const AdminProducts = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -55,16 +56,29 @@ const AdminProducts = () => {
     setLoading(false);
   };
 
-  const handleOpenDialog = (product?: Product) => {
+  const handleOpenDialog = async (product?: Product) => {
     if (product) {
       setEditingProduct(product);
+      
+      // Fetch additional images
+      const { data: additionalImages } = await supabase
+        .from("product_images")
+        .select("image_url")
+        .eq("product_id", product.id)
+        .order("display_order");
+
+      const allImages = [product.image_url];
+      if (additionalImages) {
+        allImages.push(...additionalImages.map(img => img.image_url));
+      }
+
       setFormData({
         name: product.name,
         description: product.description || "",
         price: product.price.toString(),
         category: product.category || "",
         in_stock: product.in_stock,
-        images: product.image_url ? [product.image_url] : [],
+        images: allImages,
       });
     } else {
       setEditingProduct(null);
@@ -80,21 +94,89 @@ const AdminProducts = () => {
     setIsDialogOpen(true);
   };
 
-  const handleImageUrlAdd = () => {
-    Swal.fire({
-      title: "Add Image URL",
-      input: "url",
-      inputPlaceholder: "Enter image URL",
-      showCancelButton: true,
-      confirmButtonText: "Add",
-    }).then((result) => {
-      if (result.isConfirmed && result.value) {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    if (formData.images.length >= 5) {
+      toast({
+        title: "Maximum images reached",
+        description: "You can only upload up to 5 images",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const remainingSlots = 5 - formData.images.length;
+    const filesToUpload = Array.from(files).slice(0, remainingSlots);
+
+    setUploading(true);
+
+    try {
+      const uploadedUrls: string[] = [];
+
+      for (const file of filesToUpload) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: "Invalid file type",
+            description: `${file.name} is not an image`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File too large",
+            description: `${file.name} exceeds 5MB limit`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from('product-images')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrl);
+      }
+
+      if (uploadedUrls.length > 0) {
         setFormData((prev) => ({
           ...prev,
-          images: [...prev.images, result.value],
+          images: [...prev.images, ...uploadedUrls],
         }));
+
+        toast({
+          title: "Success",
+          description: `${uploadedUrls.length} image(s) uploaded successfully`,
+        });
       }
-    });
+    } catch (error: any) {
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload images",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      // Reset file input
+      event.target.value = '';
+    }
   };
 
   const handleRemoveImage = (index: number) => {
@@ -143,6 +225,16 @@ const AdminProducts = () => {
         .from("product_images")
         .delete()
         .eq("product_id", editingProduct.id);
+
+      // Add new additional images
+      if (formData.images.length > 1) {
+        const imageRecords = formData.images.slice(1).map((img, idx) => ({
+          product_id: editingProduct.id,
+          image_url: img,
+          display_order: idx + 1,
+        }));
+        await supabase.from("product_images").insert(imageRecords);
+      }
     } else {
       const { data, error } = await supabase
         .from("products")
@@ -168,16 +260,6 @@ const AdminProducts = () => {
         }));
         await supabase.from("product_images").insert(imageRecords);
       }
-    }
-
-    // Add additional images for edit
-    if (editingProduct && formData.images.length > 1) {
-      const imageRecords = formData.images.slice(1).map((img, idx) => ({
-        product_id: editingProduct.id,
-        image_url: img,
-        display_order: idx + 1,
-      }));
-      await supabase.from("product_images").insert(imageRecords);
     }
 
     Swal.fire({
@@ -386,13 +468,16 @@ const AdminProducts = () => {
               <Label htmlFor="in_stock">In Stock</Label>
             </div>
             <div>
-              <Label>Product Images *</Label>
+              <Label>Product Images * (Max 5 images, up to 5MB each)</Label>
               <div className="mt-2 space-y-2">
                 {formData.images.map((img, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
+                  <div key={idx} className="flex items-center gap-2 p-2 border rounded">
                     <img src={img} alt="" className="w-16 h-16 object-cover rounded" />
-                    <Input value={img} readOnly className="flex-1" />
+                    <span className="text-sm text-muted-foreground flex-1">
+                      Image {idx + 1}
+                    </span>
                     <Button
+                      type="button"
                       variant="ghost"
                       size="icon"
                       onClick={() => handleRemoveImage(idx)}
@@ -401,21 +486,50 @@ const AdminProducts = () => {
                     </Button>
                   </div>
                 ))}
-                <Button
-                  variant="outline"
-                  onClick={handleImageUrlAdd}
-                  className="w-full"
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  Add Image URL
-                </Button>
+                {formData.images.length < 5 && (
+                  <div>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <Label htmlFor="image-upload">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        disabled={uploading}
+                        onClick={() => document.getElementById('image-upload')?.click()}
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        {uploading ? "Uploading..." : "Upload Images"}
+                      </Button>
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {5 - formData.images.length} slot(s) remaining
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button 
+                type="button"
+                variant="outline" 
+                onClick={() => setIsDialogOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} className="bg-accent hover:bg-accent/90">
+              <Button 
+                type="button"
+                onClick={handleSubmit} 
+                className="bg-accent hover:bg-accent/90"
+                disabled={uploading}
+              >
                 {editingProduct ? "Update" : "Create"} Product
               </Button>
             </div>
