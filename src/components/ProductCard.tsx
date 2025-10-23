@@ -102,7 +102,7 @@ const ProductCard = ({ id, name, price, image, description }: ProductCardProps) 
           </h3>
         </Link>
         <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{description}</p>
-        <p className="text-2xl font-bold text-accent">${price.toFixed(2)}</p>
+        <p className="text-2xl font-bold text-accent">₹{price.toFixed(2)}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Button 
