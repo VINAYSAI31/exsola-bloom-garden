@@ -99,9 +99,56 @@ const Products = () => {
             <h1 className="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">
               Our Products
             </h1>
-            <p className="text-muted-foreground text-lg" data-aos="fade-up" data-aos-delay="100">
+            <p className="text-muted-foreground text-lg mb-8" data-aos="fade-up" data-aos-delay="100">
               Explore our premium selection of organic mushrooms
             </p>
+            
+            {/* Category Sections */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mt-8" data-aos="fade-up" data-aos-delay="200">
+              <Card 
+                className="p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                onClick={() => {
+                  setSelectedCategories(['Mushroom Growing Kits']);
+                  window.scrollTo({ top: 400, behavior: 'smooth' });
+                }}
+              >
+                <h3 className="font-semibold text-lg mb-2">Mushroom Growing Kits</h3>
+                <p className="text-sm text-muted-foreground">Grow your own gourmet mushrooms at home</p>
+              </Card>
+              
+              <Card 
+                className="p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                onClick={() => {
+                  setSelectedCategories(['Dried Mushroom']);
+                  window.scrollTo({ top: 400, behavior: 'smooth' });
+                }}
+              >
+                <h3 className="font-semibold text-lg mb-2">Dried Mushroom</h3>
+                <p className="text-sm text-muted-foreground">Premium sundried mushrooms for cooking</p>
+              </Card>
+              
+              <Card 
+                className="p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                onClick={() => {
+                  setSelectedCategories(['Mushroom Spawn']);
+                  window.scrollTo({ top: 400, behavior: 'smooth' });
+                }}
+              >
+                <h3 className="font-semibold text-lg mb-2">Mushroom Spawn</h3>
+                <p className="text-sm text-muted-foreground">High-quality spawn for cultivation</p>
+              </Card>
+              
+              <Card 
+                className="p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                onClick={() => {
+                  setSelectedCategories(['Mushroom Cultivation Supplies']);
+                  window.scrollTo({ top: 400, behavior: 'smooth' });
+                }}
+              >
+                <h3 className="font-semibold text-lg mb-2">Cultivation Supplies</h3>
+                <p className="text-sm text-muted-foreground">Essential supplies for mushroom cultivation</p>
+              </Card>
+            </div>
           </div>
         </section>
 
