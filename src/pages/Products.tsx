@@ -171,14 +171,14 @@ const Products = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="newest">Newest First</SelectItem>
-                        <SelectItem value="price-low">Price: Low to High</SelectItem>
-                        <SelectItem value="price-high">Price: High to Low</SelectItem>
+                        {/* <SelectItem value="price-low">Price: Low to High</SelectItem> */}
+                        {/* <SelectItem value="price-high">Price: High to Low</SelectItem> */}
                         <SelectItem value="name">Name: A to Z</SelectItem>
                       </SelectContent>
                     </Select>
                   </Card>
 
-                  <Card className="p-6">
+                  {/* <Card className="p-6">
                     <h3 className="font-semibold text-lg mb-4">Price Range</h3>
                     <Select value={priceRange} onValueChange={setPriceRange}>
                       <SelectTrigger>
@@ -192,7 +192,7 @@ const Products = () => {
                         <SelectItem value="2000+">Above ₹2000</SelectItem>
                       </SelectContent>
                     </Select>
-                  </Card>
+                  </Card> */}
 
                   {categories.length > 0 && (
                     <Card className="p-6">
