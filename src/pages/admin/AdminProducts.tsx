@@ -428,7 +428,7 @@ const AdminProducts = () => {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, description: e.target.value }))
                 }
-                rows={4}
+                rows={10}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

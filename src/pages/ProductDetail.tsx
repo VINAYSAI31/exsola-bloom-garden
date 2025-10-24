@@ -214,7 +214,7 @@ const ProductDetail = () => {
 
               <div className="border-t border-b py-6">
                 <h2 className="text-xl font-semibold mb-4">Description</h2>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                   {product.description}
                 </p>
               </div>
