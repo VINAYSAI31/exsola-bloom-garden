@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "@/components/Navbar";
@@ -18,7 +18,7 @@ import { ChevronRight, Star, Shield, Microscope, Leaf, Users, Mail, Phone, MapPi
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -50,47 +50,122 @@ const Index = () => {
         <FeaturedSection />
 
         {/* Featured Products Section */}
-        <section className="py-20 bg-card">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12" data-aos="fade-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Featured Products</h2>
-              <p className="text-muted-foreground text-lg">
-                Discover our premium selection of organic mushrooms
+        <section id="products" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+              Premium Product Line
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Discover our scientifically-formulated mushroom products designed to optimize your health and performance
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Product 1 */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-green-200 transition-colors">
+                <Leaf className="w-8 h-8 text-green-800" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Premium Extracts</h3>
+              <p className="text-gray-600 mb-6">
+                Highly concentrated liquid extracts with maximum bioavailability. Perfect for daily wellness routines.
               </p>
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  10:1 Concentration Ratio
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  Third-Party Lab Tested
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  Organic Certified
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-gray-900">$89</span>
+                <button  onClick={() => navigate("/products")}  className="bg-green-800 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-green-900 transition-colors">
+                  Shop Now
+                </button>
+              </div>
             </div>
 
-            {loading ? (
-              <div className="flex justify-center items-center min-h-[300px]">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
+            {/* Product 2 */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-yellow-200 transition-colors">
+                <Star className="w-8 h-8 text-yellow-600" />
               </div>
-            ) : featuredProducts.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                  {featuredProducts.map((product) => (
-                    <ProductCard 
-                      key={product.id}
-                      id={product.id}
-                      name={product.name}
-                      price={product.price}
-                      image={product.image_url}
-                      description={product.description}
-                    />
-                  ))}
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Superfood Powders</h3>
+              <p className="text-gray-600 mb-6">
+                Versatile powders perfect for smoothies, coffee, and recipes. Easy integration into your lifestyle.
+              </p>
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  Dual Extraction Process
                 </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  30-Day Supply
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  Unflavored Option
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-gray-900">$59</span>
+                <button  onClick={() => navigate("/products")} className="bg-green-800 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-green-900 transition-colors">
+                  Shop Now
+                </button>
+              </div>
+            </div>
 
-                <div className="text-center" data-aos="fade-up">
-                  <Link to="/products">
-                    <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                      View All Products
-                    </Button>
-                  </Link>
+            {/* Product 3 */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-purple-200 transition-colors">
+                <Microscope className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Grow Kits</h3>
+              <p className="text-gray-600 mb-6">
+                Complete growing kits for cultivating your own premium mushrooms at home. Educational and rewarding.
+              </p>
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  Ready-to-Grow Setup
                 </div>
-              </>
-            ) : (
-              <p className="text-center text-muted-foreground">No products available at the moment.</p>
-            )}
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  Detailed Instructions
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  Multiple Varieties
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-gray-900">$39</span>
+                <button  onClick={() => navigate("/products")} className="bg-green-800 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-green-900 transition-colors">
+                  Shop Now
+                </button>
+              </div>
+            </div>
           </div>
-        </section>
+
+          <div className="text-center mt-12">
+          <button
+      onClick={() => navigate("/products")}
+      className="border-2 border-green-800 text-green-800 px-8 py-4 rounded-full text-lg font-semibold hover:bg-green-800 hover:text-white transition-all duration-300"
+    >
+      View All Products
+    </button>
+          </div>
+        </div>
+      </section>
 
         <HowWeMake />
         <HealthBenefits />
