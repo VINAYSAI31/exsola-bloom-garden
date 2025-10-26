@@ -70,14 +70,17 @@ const Navbar = () => {
             <Link to="/products" className="text-foreground hover:text-accent transition-colors">
               Shop
             </Link>
-            <Link to="/how-we-make" className="text-foreground hover:text-accent transition-colors">
-              How We Make
+            <Link to="/blogs" className="text-foreground hover:text-accent transition-colors">
+Blogs
             </Link>
             <Link to="/about" className="text-foreground hover:text-accent transition-colors">
               About Us
             </Link>
             <Link to="/contact" className="text-foreground hover:text-accent transition-colors">
               Contact
+            </Link>
+            <Link to="/learn" className="text-foreground hover:text-accent transition-colors">
+               Learn
             </Link>
           </div>
 
