@@ -168,7 +168,7 @@ const Index = () => {
       </section>
 
         <HowWeMake />
-        <HealthBenefits />
+        {/* <HealthBenefits /> */}
 
         {/* About Section */}
         <section id="about" className="py-20 bg-gray-900 text-white">
