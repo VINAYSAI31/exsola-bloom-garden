@@ -1,47 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import featuredImage from "@/assets/featured-mushrooms.jpg";
+import { ChevronRight, Star, Shield, Microscope, Leaf, Users, Mail, Phone, MapPin, ArrowRight, CheckCircle, Award, Zap } from 'lucide-react';
+
 
 const FeaturedSection = () => {
   return (
- <section className="relative z-10 py-20 section-gradient">
-  <div className="container mx-auto px-4">
-    <div className="flex flex-col md:flex-row items-center gap-12">
-      {/* Left Image */}
-      <div className="flex-1" data-aos="fade-right">
-        <img 
-          src={featuredImage} 
-          alt="Gourmet Mushrooms" 
-          className="rounded-lg shadow-warm w-full h-auto object-cover"
-        />
-      </div>
-
-      {/* Center Content */}
-      <div className="flex-1 text-center" data-aos="fade-up">
-        <h2 className="text-4xl md:text-5xl font-bold mb-6">
-          A Mushroom Is Full Of Delight
-        </h2>
-        <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
-        </p>
-        <Link to="/about">
-          <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-            Discover Us
-          </Button>
-        </Link>
-      </div>
-
-      {/* Right Image */}
-      <div className="flex-1" data-aos="fade-left">
-        <img 
-          src={featuredImage} 
-          alt="Fresh Mushrooms" 
-          className="rounded-lg shadow-warm w-full h-auto object-cover"
-        />
+    <section className="py-16 bg-gray-900 text-white">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+        <div className="flex flex-col items-center space-y-3">
+          <Shield className="w-12 h-12 text-yellow-400" />
+          <h3 className="font-semibold text-white">Lab Tested</h3>
+          <p className="text-gray-300 text-sm">Every product rigorously tested for purity and potency</p>
+        </div>
+        <div className="flex flex-col items-center space-y-3">
+          <Microscope className="w-12 h-12 text-yellow-400" />
+          <h3 className="font-semibold text-white">Research-Backed</h3>
+          <p className="text-gray-300 text-sm">Formulated using the latest scientific discoveries</p>
+        </div>
+        <div className="flex flex-col items-center space-y-3">
+          <Leaf className="w-12 h-12 text-yellow-400" />
+          <h3 className="font-semibold text-white">100% Natural</h3>
+          <p className="text-gray-300 text-sm">Pure, organic ingredients with no artificial additives</p>
+        </div>
+        <div className="flex flex-col items-center space-y-3">
+          <Zap className="w-12 h-12 text-yellow-400" />
+          <h3 className="font-semibold text-white">Maximum Potency</h3>
+          <p className="text-gray-300 text-sm">Concentrated extracts for optimal bioavailability</p>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
   );
 };
