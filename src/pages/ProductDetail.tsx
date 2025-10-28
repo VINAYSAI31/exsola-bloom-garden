@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, ShoppingCart, ArrowLeft, Loader2 } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -12,12 +12,10 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState<any>(null);
   const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -63,62 +61,16 @@ const ProductDetail = () => {
     setLoading(false);
   };
 
-  const handleQuantityChange = (delta: number) => {
-    if (!product) return;
-    setQuantity(Math.max(1, quantity + delta));
-  };
-
-  const handleAddToCart = async () => {
-    setIsAdding(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      toast({
-        title: "Please sign in",
-        description: "You need to sign in to add items to cart",
-        variant: "destructive",
-      });
-      navigate("/auth");
-      setIsAdding(false);
-      return;
-    }
-
-    const { data: existingItem } = await supabase
-      .from("cart_items")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .eq("product_id", id)
-      .maybeSingle();
-
-    if (existingItem) {
-      const { error } = await supabase
-        .from("cart_items")
-        .update({ quantity: existingItem.quantity + quantity })
-        .eq("id", existingItem.id);
-
-      if (!error) {
-        toast({
-          title: "Cart updated",
-          description: "Item quantity increased",
-        });
-      }
+  const handleBuyNow = () => {
+    if (product?.amazon_link) {
+      window.open(product.amazon_link, '_blank');
     } else {
-      const { error } = await supabase
-        .from("cart_items")
-        .insert({
-          user_id: session.user.id,
-          product_id: id,
-          quantity: quantity,
-        });
-
-      if (!error) {
-        toast({
-          title: "Added to cart",
-          description: `${product.name} has been added to your cart`,
-        });
-      }
+      toast({
+        title: "Coming Soon",
+        description: "This product will be available for purchase soon!",
+        variant: "default",
+      });
     }
-    setIsAdding(false);
   };
 
   if (loading) {
@@ -219,39 +171,20 @@ const ProductDetail = () => {
                 </p>
               </div>
 
-              {/* Quantity and Add to Cart */}
+              {/* Buy Now */}
               <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold">Quantity:</span>
-                  <div className="flex items-center border rounded-lg">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleQuantityChange(-1)}
-                      disabled={quantity <= 1}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="px-6 py-2 font-semibold">{quantity}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleQuantityChange(1)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
                 <Button 
                   size="lg" 
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                  disabled={!product.in_stock || isAdding}
-                  onClick={handleAddToCart}
+                  disabled={!product.in_stock}
+                  onClick={handleBuyNow}
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" />
-                  {isAdding ? "Adding..." : `Add to Cart - ₹${(product.price * quantity).toFixed(2)}`}
+                  Buy Now on Amazon - ₹{product.price.toFixed(2)}
                 </Button>
+                <p className="text-sm text-muted-foreground text-center">
+                  You will be redirected to Amazon to complete your purchase
+                </p>
               </div>
             </div>
           </div>

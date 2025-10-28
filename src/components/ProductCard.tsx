@@ -12,76 +12,22 @@ interface ProductCardProps {
   price: number;
   image: string;
   description: string;
+  amazon_link?: string;
 }
 
-const ProductCard = ({ id, name, price, image, description }: ProductCardProps) => {
+const ProductCard = ({ id, name, price, image, description, amazon_link }: ProductCardProps) => {
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [isAdding, setIsAdding] = useState(false);
 
-  const handleAddToCart = async () => {
-    setIsAdding(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      toast({
-        title: "Please sign in",
-        description: "You need to sign in to add items to cart",
-        variant: "destructive",
-      });
-      navigate("/auth");
-      setIsAdding(false);
-      return;
-    }
-
-    const { data: existingItem } = await supabase
-      .from("cart_items")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .eq("product_id", id)
-      .maybeSingle();
-
-    if (existingItem) {
-      const { error } = await supabase
-        .from("cart_items")
-        .update({ quantity: existingItem.quantity + 1 })
-        .eq("id", existingItem.id);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to update cart",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Cart updated",
-          description: "Item quantity increased",
-        });
-      }
+  const handleBuyNow = () => {
+    if (amazon_link) {
+      window.open(amazon_link, '_blank');
     } else {
-      const { error } = await supabase
-        .from("cart_items")
-        .insert({
-          user_id: session.user.id,
-          product_id: id,
-          quantity: 1,
-        });
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to add to cart",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Added to cart",
-          description: `${name} has been added to your cart`,
-        });
-      }
+      toast({
+        title: "Coming Soon",
+        description: "This product will be available for purchase soon!",
+        variant: "default",
+      });
     }
-    setIsAdding(false);
   };
 
   return (
@@ -107,11 +53,10 @@ const ProductCard = ({ id, name, price, image, description }: ProductCardProps) 
       <CardFooter className="p-4 pt-0">
         <Button 
           className="w-full bg-accent hover:bg-accent/90" 
-          onClick={handleAddToCart}
-          disabled={isAdding}
+          onClick={handleBuyNow}
         >
           <ShoppingCart className="h-4 w-4 mr-2" />
-          {isAdding ? "Adding..." : "Add to Cart"}
+          Buy Now
         </Button>
       </CardFooter>
     </Card>

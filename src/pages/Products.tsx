@@ -164,6 +164,7 @@ const Products = () => {
                     price={product.price}
                     image={product.image_url}
                     description={product.description}
+                    amazon_link={product.amazon_link}
                   />
                 ))}
               </div>

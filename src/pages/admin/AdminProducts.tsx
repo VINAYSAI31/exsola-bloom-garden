@@ -19,6 +19,7 @@ interface Product {
   category: string;
   in_stock: boolean;
   image_url: string;
+  amazon_link?: string;
 }
 
 const AdminProducts = () => {
@@ -35,6 +36,7 @@ const AdminProducts = () => {
     description: "",
     price: "",
     category: "",
+    amazon_link: "",
     in_stock: true,
     images: [] as string[],
   });
@@ -77,6 +79,7 @@ const AdminProducts = () => {
         description: product.description || "",
         price: product.price.toString(),
         category: product.category || "",
+        amazon_link: product.amazon_link || "",
         in_stock: product.in_stock,
         images: allImages,
       });
@@ -87,6 +90,7 @@ const AdminProducts = () => {
         description: "",
         price: "",
         category: "",
+        amazon_link: "",
         in_stock: true,
         images: [],
       });
@@ -201,6 +205,7 @@ const AdminProducts = () => {
       description: formData.description,
       price: parseFloat(formData.price),
       category: formData.category,
+      amazon_link: formData.amazon_link || null,
       in_stock: formData.in_stock,
       image_url: formData.images[0],
     };
@@ -454,6 +459,21 @@ const AdminProducts = () => {
                   }
                 />
               </div>
+            </div>
+            <div>
+              <Label htmlFor="amazon_link">Amazon Product Link</Label>
+              <Input
+                id="amazon_link"
+                type="url"
+                placeholder="https://amazon.in/dp/..."
+                value={formData.amazon_link}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, amazon_link: e.target.value }))
+                }
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Customers will be redirected to this Amazon link when they click "Buy Now"
+              </p>
             </div>
             <div className="flex items-center space-x-2">
               <input

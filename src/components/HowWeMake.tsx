@@ -1,69 +1,41 @@
-import howWeImage from "@/assets/how-we-make.jpg";
-import { ChevronRight, Star, Shield, Microscope, Leaf, Users, Mail, Phone, MapPin, ArrowRight, CheckCircle, Award, Zap } from 'lucide-react';
-
-
 const HowWeMake = () => {
   return (
-    <section id="science" className="py-20 bg-white">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div>
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            Backed by
-            <span className="text-green-800 block">Cutting-Edge Science</span>
-          </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            At exola Labs, we combine traditional wisdom with modern scientific research to create 
-            the most effective mushroom supplements on the market.
-          </p>
-          
-          <div className="space-y-6">
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Microscope className="w-6 h-6 text-green-800" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Advanced Extraction</h3>
-                <p className="text-gray-600">Proprietary dual-extraction methods preserve and concentrate bioactive compounds for maximum efficacy.</p>
-              </div>
+    <section id="founders" className="py-20 bg-gradient-to-br from-green-50 via-white to-green-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-left">
+            <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-5">
+              Founders' Stories
             </div>
-            
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Shield className="w-6 h-6 text-green-800" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Quality Assurance</h3>
-                <p className="text-gray-600">Every batch undergoes rigorous testing for purity, potency, and safety by certified third-party laboratories.</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Award className="w-6 h-6 text-green-800" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Research Partnership</h3>
-                <p className="text-gray-600">Collaborating with leading universities and research institutions to advance mushroom science.</p>
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+              Two Stories. <span className="text-green-800">One Mission.</span>
+            </h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl">
+              Clean, professional storytelling aligned with Exsola’s nature-forward ethos.
+            </p>
+
+            <div className="mt-8 rounded-2xl bg-white/70 backdrop-blur-sm ring-1 ring-black/5 shadow-sm">
+              <div className="p-6 lg:p-8">
+                <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
+                  <p>
+                    In a quiet farming village, my co-founder Akhil grew up watching fields of grain sway in the wind. Every harvest left behind mountains of dry straw. With no easy use for it, the straw was set on fire, filling the air with smoke and ash. He kept asking himself: "Isn't there a better way?" That question became an idea - to turn this agricultural "waste" into a resource by using it for mushroom cultivation, creating food and income instead of pollution.
+                  </p>
+                  <p>
+                    Far away, I (Edith) was born and raised in a bustling, developed city. Here, the problem wasn't burning straw but the rising fear around chemical-based medications. I saw how many people hesitated to take pills filled with synthetic compounds, longing instead for safe, natural alternatives. Those experiences planted another idea in me that mushrooms could provide the same benefits in a completely organic way through liquid extracts, powders, and DIY kits.
+                  </p>
+                  <div className="border-l-4 border-green-700/20 pl-4 italic text-gray-800">
+                    Two very different paths. Two different problems. But the same belief: nature holds the answers.
+                  </div>
+                  <p>
+                    So we joined hands and created Exsola a company built to transform waste into life and bring the healing power of mushrooms into everyday homes. Together, we're making a sustainable difference.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className="relative">
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 h-96 flex items-center justify-center">
-            <div className="text-center">
-              <Microscope className="w-24 h-24 text-green-800 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">exola Labs</h3>
-              <p className="text-gray-600">Where Science Meets Nature</p>
-            </div>
-          </div>
-          <div className="absolute -top-6 -right-6 w-32 h-32 bg-yellow-200 rounded-full opacity-30"></div>
-          <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-green-200 rounded-full opacity-40"></div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
   );
 };
 
