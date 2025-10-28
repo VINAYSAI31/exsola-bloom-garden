@@ -59,7 +59,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-primary">Exsola</span>
+            <img
+              src="/logo.jpg"
+              alt="Exsola"
+              className="h-32 w-auto"
+            />
           </Link>
 
           {/* Navigation Links */}

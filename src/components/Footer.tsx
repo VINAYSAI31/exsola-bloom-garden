@@ -10,8 +10,8 @@ const Footer = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1 md:col-span-2">
           <div className="flex items-center mb-4">
-            <Leaf className="h-8 w-8 text-green-400" />
-            <span className="ml-2 text-2xl font-bold">exola</span>
+           
+            <span className="ml-2 text-2xl font-bold">EXSOLA</span>
           </div>
           <p className="text-gray-300 mb-4 max-w-md">
             Revolutionizing wellness through premium mushroom products backed by cutting-edge science and research.
