@@ -13,6 +13,12 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import HowWeMakePage from "./pages/HowWeMakePage";
+import Blogs from "./pages/Blogs";
+import Learn from "./pages/Learn";
+import TermsConditions from "./pages/TermsConditions";
+import ReturnRefund from "./pages/ReturnRefund";
+import FAQ from "./pages/FAQ";
+import StoreLocation from "./pages/StoreLocation";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -49,6 +55,12 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/how-we-make" element={<HowWeMakePage />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/terms-conditions" element={<TermsConditions />} />
+          <Route path="/return-refund" element={<ReturnRefund />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/store-location" element={<StoreLocation />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />

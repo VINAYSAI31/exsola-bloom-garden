@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const Products = () => {
@@ -134,6 +134,25 @@ const Products = () => {
             {loading ? (
               <div className="flex justify-center items-center min-h-[400px]">
                 <Loader2 className="h-8 w-8 animate-spin text-accent" />
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+                <div className="max-w-md mx-auto bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-12 border border-green-200">
+                  <div className="w-20 h-20 bg-green-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Clock className="w-10 h-10 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Coming Soon</h2>
+                  <p className="text-gray-600 mb-6">
+                    {selectedCategories.length > 0 
+                      ? `We're preparing amazing ${selectedCategories[0].toLowerCase()} products for you. Stay tuned for updates!`
+                      : "We're preparing amazing products for you. Stay tuned for updates!"
+                    }
+                  </p>
+                  <div className="flex items-center justify-center text-sm text-gray-500">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Products coming soon
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

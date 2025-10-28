@@ -54,8 +54,8 @@ const Contact = () => {
                   <CardDescription>Send us an email anytime</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-foreground">info@exsola.com</p>
-                  <p className="text-foreground">support@exsola.com</p>
+                  <p className="text-foreground">exsolasciences@gmail.com</p>
+                 
                 </CardContent>
               </Card>
 
@@ -68,8 +68,7 @@ const Contact = () => {
                   <CardDescription>Mon-Fri 9am-6pm EST</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-foreground">+1 (555) 123-4567</p>
-                  <p className="text-foreground">+1 (555) 987-6543</p>
+                  <p className="text-foreground">+91 9492987157</p>
                 </CardContent>
               </Card>
 
@@ -82,8 +81,10 @@ const Contact = () => {
                   <CardDescription>Come see our farm</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-foreground">123 Farm Road</p>
-                  <p className="text-foreground">Portland, OR 97201</p>
+                  <p className="text-foreground">Roma Enclave 3, Road No.5
+
+</p>
+                  <p className="text-foreground">Badangpet, Balapur Mandal, Ranga Reddy District, Hyderabad 500058</p>
                 </CardContent>
               </Card>
             </div>

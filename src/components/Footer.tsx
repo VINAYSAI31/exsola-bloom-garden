@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="col-span-1 md:col-span-2">
           <div className="flex items-center mb-4">
             <Leaf className="h-8 w-8 text-green-400" />
-            <span className="ml-2 text-2xl font-bold">EXORA</span>
+            <span className="ml-2 text-2xl font-bold">exola</span>
           </div>
           <p className="text-gray-300 mb-4 max-w-md">
             Revolutionizing wellness through premium mushroom products backed by cutting-edge science and research.
@@ -30,28 +30,29 @@ const Footer = () => {
         </div>
         
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-white">Products</h3>
+          <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
           <ul className="space-y-2 text-gray-300">
-            <li><a href="#" className="hover:text-green-400 transition-colors">Extracts</a></li>
-            <li><a href="#" className="hover:text-green-400 transition-colors">Powders</a></li>
-            <li><a href="#" className="hover:text-green-400 transition-colors">Grow Kits</a></li>
-            <li><a href="#" className="hover:text-green-400 transition-colors">Bundles</a></li>
+            <li><Link to="/products" className="hover:text-green-400 transition-colors">Shop</Link></li>
+            <li><Link to="/terms-conditions" className="hover:text-green-400 transition-colors">Terms and Conditions</Link></li>
+            <li><Link to="/return-refund" className="hover:text-green-400 transition-colors">Return and Refund Policy</Link></li>
+            <li><Link to="/faq" className="hover:text-green-400 transition-colors">FAQ</Link></li>
+            <li><Link to="/store-location" className="hover:text-green-400 transition-colors">Store Location</Link></li>
           </ul>
         </div>
         
         <div>
           <h3 className="text-lg font-semibold mb-4 text-white">Company</h3>
           <ul className="space-y-2 text-gray-300">
-            <li><a href="#" className="hover:text-green-400 transition-colors">About Us</a></li>
-            <li><a href="#" className="hover:text-green-400 transition-colors">Research</a></li>
-            <li><a href="#" className="hover:text-green-400 transition-colors">Blog</a></li>
-            <li><a href="#" className="hover:text-green-400 transition-colors">Contact</a></li>
+            <li><Link to="/about" className="hover:text-green-400 transition-colors">About Us</Link></li>
+            <li><Link to="/blogs" className="hover:text-green-400 transition-colors">Blogs</Link></li>
+            <li><Link to="/learn" className="hover:text-green-400 transition-colors">Learn</Link></li>
+            <li><Link to="/contact" className="hover:text-green-400 transition-colors">Contact</Link></li>
           </ul>
         </div>
       </div>
       
       <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-300">
-        <p>&copy; 2025 EXORA Labs. All rights reserved. | Privacy Policy | Terms of Service</p>
+        <p>&copy; 2025 exola Labs. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>

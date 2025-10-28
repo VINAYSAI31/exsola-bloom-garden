@@ -13,7 +13,7 @@ const HowWeMake = () => {
             <span className="text-green-800 block">Cutting-Edge Science</span>
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            At EXORA Labs, we combine traditional wisdom with modern scientific research to create 
+            At exola Labs, we combine traditional wisdom with modern scientific research to create 
             the most effective mushroom supplements on the market.
           </p>
           
@@ -54,7 +54,7 @@ const HowWeMake = () => {
           <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 h-96 flex items-center justify-center">
             <div className="text-center">
               <Microscope className="w-24 h-24 text-green-800 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">EXORA Labs</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">exola Labs</h3>
               <p className="text-gray-600">Where Science Meets Nature</p>
             </div>
           </div>
