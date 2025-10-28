@@ -100,7 +100,11 @@ const Index = () => {
                 </div>
                 <div className="mt-auto flex items-center justify-between">
                   <span className="text-sm text-gray-500">In stock</span>
-                  <button className="bg-green-800 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-green-900 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/products")}
+                    className="bg-green-800 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-green-900 transition-colors"
+                  >
                     Shop Now
                   </button>
                 </div>
@@ -201,7 +205,11 @@ const Index = () => {
             </div>
 
             <div className="text-center mt-12">
-              <button className="border-2 border-green-800 text-green-800 px-8 py-4 rounded-full text-lg font-semibold hover:bg-green-800 hover:text-white transition-all duration-300">
+              <button
+                type="button"
+                onClick={() => navigate("/products")}
+                className="border-2 border-green-800 text-green-800 px-8 py-4 rounded-full text-lg font-semibold hover:bg-green-800 hover:text-white transition-all duration-300"
+              >
                 View All Products
               </button>
             </div>
@@ -341,6 +349,8 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        
       </main>
       <Footer />
     </div>
