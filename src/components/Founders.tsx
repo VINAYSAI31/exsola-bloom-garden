@@ -11,7 +11,7 @@ const Founders = () => {
           </div>
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             Visionaries Behind
-            <span className="text-green-800 block">exola Labs</span>
+            <span className="text-green-800 block">exsola sciences</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Meet the passionate minds who are revolutionizing the mushroom industry 

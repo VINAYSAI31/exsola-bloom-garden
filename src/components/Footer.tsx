@@ -52,7 +52,7 @@ const Footer = () => {
       </div>
       
       <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-300">
-        <p>&copy; 2025 exola Labs. All rights reserved. | Privacy Policy | Terms of Service</p>
+        <p>&copy; 2025 exsola sciences. All rights reserved. | Privacy Policy | Terms of Service</p>
       </div>
     </div>
   </footer>

@@ -23,7 +23,7 @@ const HeroSection = () => {
             </h1>
             <p className="text-xl text-gray-600 max-w-lg">
               Revolutionary mushroom grow kits backed by cutting-edge research. 
-              Experience the future of wellness with exola Labs.
+              Experience the future of wellness with exsola sciences.
             </p>
           </div>
           
