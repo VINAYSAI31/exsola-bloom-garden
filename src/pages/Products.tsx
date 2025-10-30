@@ -56,11 +56,11 @@ const Products = () => {
         {/* Header */}
         <section className="py-16 section-gradient">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black" data-aos="fade-up">
               Our Products
             </h1>
             <p
-              className="text-muted-foreground text-lg mb-8"
+              className=" text-lg mb-8 text-gray-600"
               data-aos="fade-up"
               data-aos-delay="100"
             >
@@ -74,14 +74,14 @@ const Products = () => {
               data-aos-delay="200"
             >
               <Card
-                className="p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105"
+                className=" p-6 cursor-pointer hover:shadow-lg transition-all hover:scale-105 "
                 onClick={() => {
                   setSelectedCategories(["Mushroom Growing Kits"]);
                   window.scrollTo({ top: 400, behavior: "smooth" });
                 }}
               >
-                <h3 className="font-semibold text-lg mb-2">Mushroom Growing Kits</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-lg mb-2 text-black">Mushroom Growing Kits</h3>
+                <p className="text-sm  text-gray-600">
                   Grow your own gourmet mushrooms at home
                 </p>
               </Card>
@@ -93,8 +93,8 @@ const Products = () => {
                   window.scrollTo({ top: 400, behavior: "smooth" });
                 }}
               >
-                <h3 className="font-semibold text-lg mb-2">Dried Mushroom</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-lg mb-2 text-black">Dried Mushroom</h3>
+                <p className="text-sm text-muted-foreground text-gray-600">
                   Premium sundried mushrooms for cooking
                 </p>
               </Card>
@@ -106,8 +106,8 @@ const Products = () => {
                   window.scrollTo({ top: 400, behavior: "smooth" });
                 }}
               >
-                <h3 className="font-semibold text-lg mb-2">Mushroom Spawn</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-lg mb-2 text-black">Mushroom Spawn</h3>
+                <p className="text-sm text-muted-foreground text-gray-600">
                   High-quality spawn for cultivation
                 </p>
               </Card>
@@ -119,8 +119,8 @@ const Products = () => {
                   window.scrollTo({ top: 400, behavior: "smooth" });
                 }}
               >
-                <h3 className="font-semibold text-lg mb-2">Cultivation Supplies</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-lg mb-2 text-black">Cultivation Supplies</h3>
+                <p className="text-sm text-muted-foreground text-gray-600">
                   Essential supplies for mushroom cultivation
                 </p>
               </Card>
