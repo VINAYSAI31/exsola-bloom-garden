@@ -94,7 +94,7 @@ const Products = () => {
                 }}
               >
                 <h3 className="font-semibold text-lg mb-2 text-black">Dried Mushroom</h3>
-                <p className="text-sm text-muted-foreground text-gray-600">
+                <p className="text-sm  text-gray-600">
                   Premium sundried mushrooms for cooking
                 </p>
               </Card>
@@ -107,7 +107,7 @@ const Products = () => {
                 }}
               >
                 <h3 className="font-semibold text-lg mb-2 text-black">Mushroom Spawn</h3>
-                <p className="text-sm text-muted-foreground text-gray-600">
+                <p className="text-sm  text-gray-600">
                   High-quality spawn for cultivation
                 </p>
               </Card>
@@ -120,7 +120,7 @@ const Products = () => {
                 }}
               >
                 <h3 className="font-semibold text-lg mb-2 text-black">Cultivation Supplies</h3>
-                <p className="text-sm text-muted-foreground text-gray-600">
+                <p className="text-sm  text-gray-600">
                   Essential supplies for mushroom cultivation
                 </p>
               </Card>
