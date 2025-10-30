@@ -17,15 +17,15 @@ const Footer = () => {
             Revolutionizing wellness through premium mushroom products backed by cutting-edge science and research.
           </p>
           <div className="flex space-x-4">
-            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors cursor-pointer">
-              <span className="text-sm font-bold">f</span>
-            </div>
-            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors cursor-pointer">
-              <span className="text-sm font-bold">t</span>
-            </div>
-            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-green-600 transition-colors cursor-pointer">
-              <span className="text-sm font-bold">in</span>
-            </div>
+            <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
+              <Facebook className="w-5 h-5 text-blue-600" />
+            </a>
+            <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
+              <Twitter className="w-5 h-5 text-blue-400" />
+            </a>
+            <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
+              <Instagram className="w-5 h-5 text-pink-600" />
+            </a>
           </div>
         </div>
         

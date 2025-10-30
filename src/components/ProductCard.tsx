@@ -31,9 +31,10 @@ const ProductCard = ({ id, name, price, image, description, amazon_link }: Produ
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-accent transition-all duration-300" data-aos="fade-up">
+    <Link to={`/products/${id}`}>
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group h-full flex flex-col">
       <Link to={`/products/${id}`}>
-        <div className="aspect-square overflow-hidden">
+        <div className="aspect-square overflow-hidden h-128">
           <img 
             src={image} 
             alt={name} 
@@ -41,25 +42,26 @@ const ProductCard = ({ id, name, price, image, description, amazon_link }: Produ
           />
         </div>
       </Link>
-      <CardContent className="p-4">
+      <div className="p-6 flex flex-col flex-1">
         <Link to={`/products/${id}`}>
-          <h3 className="text-lg font-semibold mb-2 group-hover:text-accent transition-colors">
+          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-800 transition-colors">
             {name}
           </h3>
         </Link>
-        <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{description}</p>
-        <p className="text-2xl font-bold text-accent">₹{price.toFixed(2)}</p>
-      </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <Button 
-          className="w-full bg-accent hover:bg-accent/90" 
-          onClick={handleBuyNow}
-        >
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          Buy Now
-        </Button>
-      </CardFooter>
-    </Card>
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">{description}</p>
+        <div className="mt-auto">
+          <p className="text-2xl font-bold text-gray-900 mb-4">₹{price.toFixed(2)}</p>
+          <button 
+            className="w-full bg-green-800 text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-green-900 transition-colors flex items-center justify-center"
+            onClick={handleBuyNow}
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+    </Link>
   );
 };
 
