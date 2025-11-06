@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -20,30 +19,6 @@ const Learn = () => {
             </p>
           </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-center gap-4 mb-16">
-            <Link to="/blogs">
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-green-800 text-green-800 hover:bg-green-800 hover:text-white px-8 py-3 rounded-full"
-              >
-                <BookOpen className="w-5 h-5 mr-2" />
-                Blogs
-              </Button>
-            </Link>
-            <Link to="/learn">
-              <Button 
-                variant="default" 
-                size="lg"
-                className="bg-green-800 hover:bg-green-900 text-white px-8 py-3 rounded-full"
-              >
-                <Users className="w-5 h-5 mr-2" />
-                Learn
-              </Button>
-            </Link>
-          </div>
-
           {/* Coming Soon Section */}
           <div className="text-center py-20">
             <div className="max-w-md mx-auto bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-12 border border-green-200">
@@ -61,37 +36,43 @@ const Learn = () => {
             </div>
           </div>
 
-          {/* Feature Preview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-6 h-6 text-green-800" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Research Articles</h3>
-              <p className="text-gray-600 text-sm">
-                In-depth scientific articles about mushroom benefits and cultivation techniques
-              </p>
-            </div>
+          {/* Feature Preview - Now as buttons */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+            <Link to="/blogs?category=research">
+              <button className="w-full bg-white border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition-all">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-6 h-6 text-green-800" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Research Articles</h3>
+                <p className="text-gray-600 text-sm">
+                  In-depth scientific articles about mushroom benefits and cultivation techniques
+                </p>
+              </button>
+            </Link>
             
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-6 h-6 text-green-800" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Workshops</h3>
-              <p className="text-gray-600 text-sm">
-                Interactive learning sessions and hands-on mushroom growing workshops
-              </p>
-            </div>
+            <Link to="/blogs?category=workshop">
+              <button className="w-full bg-white border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition-all">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-6 h-6 text-green-800" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Workshops</h3>
+                <p className="text-gray-600 text-sm">
+                  Interactive learning sessions and hands-on mushroom growing workshops
+                </p>
+              </button>
+            </Link>
             
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-6 h-6 text-green-800" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Events</h3>
-              <p className="text-gray-600 text-sm">
-                Community events, webinars, and educational sessions about mushrooms
-              </p>
-            </div>
+            <Link to="/blogs?category=event">
+              <button className="w-full bg-white border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition-all">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="w-6 h-6 text-green-800" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Events</h3>
+                <p className="text-gray-600 text-sm">
+                  Community events, webinars, and educational sessions about mushrooms
+                </p>
+              </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -15,6 +15,7 @@ import Auth from "./pages/Auth";
 import HowWeMakePage from "./pages/HowWeMakePage";
 import Blogs from "./pages/Blogs";
 import Learn from "./pages/Learn";
+import BlogDetail from "./pages/BlogDetail";
 import TermsConditions from "./pages/TermsConditions";
 import ReturnRefund from "./pages/ReturnRefund";
 import FAQ from "./pages/FAQ";
@@ -22,6 +23,7 @@ import StoreLocation from "./pages/StoreLocation";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
+import AdminBlogs from "./pages/admin/AdminBlogs";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -56,6 +58,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/how-we-make" element={<HowWeMakePage />} />
           <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blogs/:id" element={<BlogDetail />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
           <Route path="/return-refund" element={<ReturnRefund />} />
@@ -69,6 +72,7 @@ const App = () => (
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="products" element={<AdminProducts />} />
+            <Route path="blogs" element={<AdminBlogs />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="settings" element={<AdminSettings />} />

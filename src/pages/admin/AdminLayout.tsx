@@ -8,7 +8,8 @@ import {
   LogOut,
   Home,
   Menu,
-  X
+  X,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,7 @@ const AdminLayout = () => {
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
     { icon: Package, label: "Products", path: "/admin/products" },
+    { icon: BookOpen, label: "Blogs", path: "/admin/blogs" },
     { icon: Users, label: "Users", path: "/admin/users" },
     { icon: ShoppingCart, label: "Orders", path: "/admin/orders" },
     { icon: Settings, label: "Settings", path: "/admin/settings" },

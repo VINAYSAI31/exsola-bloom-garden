@@ -53,6 +53,39 @@ export type Database = {
         }
         Relationships: []
       }
+      blogs: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          read_time: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string
+          content: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          read_time?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          read_time?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string | null
@@ -182,6 +215,7 @@ export type Database = {
       }
       products: {
         Row: {
+          amazon_link: string | null
           category: string | null
           created_at: string | null
           description: string | null
@@ -192,6 +226,7 @@ export type Database = {
           price: number
         }
         Insert: {
+          amazon_link?: string | null
           category?: string | null
           created_at?: string | null
           description?: string | null
@@ -202,6 +237,7 @@ export type Database = {
           price: number
         }
         Update: {
+          amazon_link?: string | null
           category?: string | null
           created_at?: string | null
           description?: string | null

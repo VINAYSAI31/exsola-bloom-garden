@@ -14,7 +14,7 @@ const Footer = () => {
             <span className="ml-2 text-2xl font-bold">EXSOLA</span>
           </div>
           <p className="text-gray-300 mb-4 max-w-md">
-            Revolutionizing wellness through premium mushroom products backed by cutting-edge science and research.
+            We grow what earth leaves behind
           </p>
           <div className="flex space-x-4">
             <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
@@ -23,7 +23,7 @@ const Footer = () => {
             <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
               <Twitter className="w-5 h-5 text-blue-400" />
             </a>
-            <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
+            <a href="https://www.instagram.com/exsola_sciences?igsh=MWUzZzk5cHJmb21y" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
               <Instagram className="w-5 h-5 text-pink-600" />
             </a>
           </div>
