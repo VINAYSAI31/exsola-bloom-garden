@@ -294,6 +294,48 @@ export type Database = {
         }
         Relationships: []
       }
+      workshops: {
+        Row: {
+          best_for: string
+          created_at: string | null
+          duration: string
+          format: string
+          id: string
+          image_url: string | null
+          learning_points: string[]
+          price: number
+          take_home: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          best_for: string
+          created_at?: string | null
+          duration: string
+          format: string
+          id?: string
+          image_url?: string | null
+          learning_points: string[]
+          price: number
+          take_home: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          best_for?: string
+          created_at?: string | null
+          duration?: string
+          format?: string
+          id?: string
+          image_url?: string | null
+          learning_points?: string[]
+          price?: number
+          take_home?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
