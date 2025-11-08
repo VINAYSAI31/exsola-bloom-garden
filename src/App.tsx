@@ -15,8 +15,8 @@ import Auth from "./pages/Auth";
 import HowWeMakePage from "./pages/HowWeMakePage";
 import Blogs from "./pages/Blogs";
 import Learn from "./pages/Learn";
-import Workshops from "./pages/Workshops";
 import BlogDetail from "./pages/BlogDetail";
+import WorkshopDetail from "./pages/WorkshopDetail";
 import TermsConditions from "./pages/TermsConditions";
 import ReturnRefund from "./pages/ReturnRefund";
 import FAQ from "./pages/FAQ";
@@ -61,8 +61,8 @@ const App = () => (
           <Route path="/how-we-make" element={<HowWeMakePage />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blogs/:id" element={<BlogDetail />} />
+          <Route path="/workshops/:id" element={<WorkshopDetail />} />
           <Route path="/learn" element={<Learn />} />
-          <Route path="/workshops" element={<Workshops />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
           <Route path="/return-refund" element={<ReturnRefund />} />
           <Route path="/faq" element={<FAQ />} />

@@ -15,9 +15,23 @@ interface Blog {
   created_at: string;
 }
 
+interface Workshop {
+  id: string;
+  title: string;
+  duration: string;
+  format: string;
+  learning_points: string[];
+  take_home: string;
+  best_for: string;
+  price: number;
+  image_url: string | null;
+  created_at: string;
+}
+
 const Blogs = () => {
   const [activeCategory, setActiveCategory] = useState<string>("research");
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -26,16 +40,28 @@ const Blogs = () => {
 
   const fetchBlogs = async () => {
     try {
-      const { data, error } = await supabase
-        .from("blogs")
-        .select("*")
-        .eq("category", activeCategory)
-        .order("created_at", { ascending: false });
+      if (activeCategory === "workshop") {
+        const { data, error } = await supabase
+          .from("workshops")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setBlogs(data || []);
+        if (error) throw error;
+        setWorkshops(data || []);
+        setBlogs([]);
+      } else {
+        const { data, error } = await supabase
+          .from("blogs")
+          .select("*")
+          .eq("category", activeCategory)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        setBlogs(data || []);
+        setWorkshops([]);
+      }
     } catch (error) {
-      console.error("Error fetching blogs:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -104,11 +130,70 @@ const Blogs = () => {
             </button>
           </div>
 
-          {/* Blog Posts */}
+          {/* Content */}
           {isLoading ? (
             <div className="text-center py-20">
               <p className="text-xl text-gray-600">Loading...</p>
             </div>
+          ) : activeCategory === "workshop" ? (
+            workshops.length === 0 ? (
+              <div className="text-center py-20">
+                <div className="max-w-md mx-auto bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-12 border border-green-200">
+                  <div className="w-20 h-20 bg-green-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Users className="w-10 h-10 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Coming Soon</h2>
+                  <p className="text-gray-600 mb-6">
+                    We're preparing amazing workshops for this section.
+                  </p>
+                  <div className="flex items-center justify-center text-sm text-gray-500">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Stay tuned for updates
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {workshops.map((workshop) => (
+                  <Link key={workshop.id} to={`/workshops/${workshop.id}`}>
+                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                      {workshop.image_url && (
+                        <img
+                          src={workshop.image_url}
+                          alt={workshop.title}
+                          className="w-full h-48 object-cover"
+                        />
+                      )}
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          {workshop.title}
+                        </h3>
+                        <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                          <span>{workshop.duration}</span>
+                          <span>•</span>
+                          <span>{workshop.format}</span>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-sm font-semibold text-gray-700 mb-2">You Will Learn:</p>
+                          <ul className="text-sm text-gray-600 space-y-1">
+                            {workshop.learning_points.slice(0, 3).map((point, idx) => (
+                              <li key={idx} className="flex items-start">
+                                <span className="mr-2">•</span>
+                                <span className="line-clamp-1">{point}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                          <span className="text-2xl font-bold text-green-800">₹{workshop.price}</span>
+                          <span className="text-sm text-gray-500">{workshop.best_for}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )
           ) : blogs.length === 0 ? (
             <div className="text-center py-20">
               <div className="max-w-md mx-auto bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-12 border border-green-200">
