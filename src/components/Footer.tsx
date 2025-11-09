@@ -17,7 +17,7 @@ const Footer = () => {
             We grow what earth leaves behind
           </p>
           <div className="flex space-x-4">
-            <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
+            <a href="https://www.facebook.com/share/1D9FDhyc2m/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
               <Facebook className="w-5 h-5 text-blue-600" />
             </a>
             <a href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer">
@@ -45,6 +45,7 @@ const Footer = () => {
           <ul className="space-y-2 text-gray-300">
             <li><Link to="/about" className="hover:text-green-400 transition-colors">About Us</Link></li>
             <li><Link to="/blogs" className="hover:text-green-400 transition-colors">Blogs</Link></li>
+            <li><Link to="/events" className="hover:text-green-400 transition-colors">Events</Link></li>
             <li><Link to="/learn" className="hover:text-green-400 transition-colors">Learn</Link></li>
             <li><Link to="/contact" className="hover:text-green-400 transition-colors">Contact</Link></li>
           </ul>

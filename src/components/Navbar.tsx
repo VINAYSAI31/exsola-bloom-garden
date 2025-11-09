@@ -77,6 +77,9 @@ const Navbar = () => {
             <Link to="/blogs" className="text-foreground hover:text-accent transition-colors">
 Blogs
             </Link>
+            <Link to="/events" className="text-foreground hover:text-accent transition-colors">
+              Events
+            </Link>
             <Link to="/about" className="text-foreground hover:text-accent transition-colors">
               About Us
             </Link>

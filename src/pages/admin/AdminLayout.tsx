@@ -43,6 +43,7 @@ const AdminLayout = () => {
     { icon: Package, label: "Products", path: "/admin/products" },
     { icon: BookOpen, label: "Blogs", path: "/admin/blogs" },
     { icon: Briefcase, label: "Workshops", path: "/admin/workshops" },
+    { icon: Briefcase, label: "Events", path: "/admin/events" },
     { icon: Users, label: "Users", path: "/admin/users" },
     { icon: ShoppingCart, label: "Orders", path: "/admin/orders" },
     { icon: Settings, label: "Settings", path: "/admin/settings" },

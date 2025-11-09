@@ -21,11 +21,13 @@ import TermsConditions from "./pages/TermsConditions";
 import ReturnRefund from "./pages/ReturnRefund";
 import FAQ from "./pages/FAQ";
 import StoreLocation from "./pages/StoreLocation";
+import Events from "./pages/Events";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminBlogs from "./pages/admin/AdminBlogs";
 import AdminWorkshops from "./pages/admin/AdminWorkshops";
+import AdminEvents from "./pages/admin/AdminEvents";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -67,6 +69,7 @@ const App = () => (
           <Route path="/return-refund" element={<ReturnRefund />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/store-location" element={<StoreLocation />} />
+          <Route path="/events" element={<Events />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
@@ -77,6 +80,7 @@ const App = () => (
             <Route path="products" element={<AdminProducts />} />
           <Route path="blogs" element={<AdminBlogs />} />
           <Route path="workshops" element={<AdminWorkshops />} />
+          <Route path="events" element={<AdminEvents />} />
           <Route path="users" element={<AdminUsers />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="settings" element={<AdminSettings />} />
