@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, LogOut } from "lucide-react";
+import { ShoppingCart, User, LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,10 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Navbar = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [cartCount, setCartCount] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,7 +68,7 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Navigation Links */}
+          {/* Navigation Links - Desktop */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-foreground hover:text-accent transition-colors">
               Home
@@ -75,7 +77,7 @@ const Navbar = () => {
               Shop
             </Link>
             <Link to="/blogs" className="text-foreground hover:text-accent transition-colors">
-Blogs
+              Blogs
             </Link>
             <Link to="/events" className="text-foreground hover:text-accent transition-colors">
               Events
@@ -87,8 +89,72 @@ Blogs
               Contact
             </Link>
             <Link to="/learn" className="text-foreground hover:text-accent transition-colors">
-               Learn
+              Learn
             </Link>
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="md:hidden">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px]">
+                <nav className="flex flex-col space-y-4 mt-8">
+                  <Link 
+                    to="/" 
+                    className="text-foreground hover:text-accent transition-colors text-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link 
+                    to="/products" 
+                    className="text-foreground hover:text-accent transition-colors text-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Shop
+                  </Link>
+                  <Link 
+                    to="/blogs" 
+                    className="text-foreground hover:text-accent transition-colors text-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Blogs
+                  </Link>
+                  <Link 
+                    to="/events" 
+                    className="text-foreground hover:text-accent transition-colors text-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Events
+                  </Link>
+                  <Link 
+                    to="/about" 
+                    className="text-foreground hover:text-accent transition-colors text-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    About Us
+                  </Link>
+                  <Link 
+                    to="/contact" 
+                    className="text-foreground hover:text-accent transition-colors text-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Contact
+                  </Link>
+                  <Link 
+                    to="/learn" 
+                    className="text-foreground hover:text-accent transition-colors text-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Learn
+                  </Link>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
 
           {/* Actions */}
