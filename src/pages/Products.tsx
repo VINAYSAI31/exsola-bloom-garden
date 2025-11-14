@@ -69,7 +69,7 @@ const Products = () => {
 
             {/* Category Sections */}
             <div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mt-8"
+              className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mt-8"
               data-aos="fade-up"
               data-aos-delay="200"
             >
@@ -155,8 +155,7 @@ const Products = () => {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
-                {filteredProducts.map((product) => (
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">{filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
                     id={product.id}

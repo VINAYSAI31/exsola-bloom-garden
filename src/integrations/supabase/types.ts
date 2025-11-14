@@ -53,6 +53,39 @@ export type Database = {
         }
         Relationships: []
       }
+      blogs: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          read_time: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string
+          content: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          read_time?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          read_time?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string | null
@@ -84,6 +117,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          description: string
+          event_date: string | null
+          id: string
+          image_url: string | null
+          location: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          event_date?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          event_date?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       order_items: {
         Row: {
@@ -182,6 +248,7 @@ export type Database = {
       }
       products: {
         Row: {
+          amazon_link: string | null
           category: string | null
           created_at: string | null
           description: string | null
@@ -192,6 +259,7 @@ export type Database = {
           price: number
         }
         Insert: {
+          amazon_link?: string | null
           category?: string | null
           created_at?: string | null
           description?: string | null
@@ -202,6 +270,7 @@ export type Database = {
           price: number
         }
         Update: {
+          amazon_link?: string | null
           category?: string | null
           created_at?: string | null
           description?: string | null
@@ -255,6 +324,48 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      workshops: {
+        Row: {
+          best_for: string
+          created_at: string | null
+          duration: string
+          format: string
+          id: string
+          image_url: string | null
+          learning_points: string[]
+          price: number
+          take_home: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          best_for: string
+          created_at?: string | null
+          duration: string
+          format: string
+          id?: string
+          image_url?: string | null
+          learning_points: string[]
+          price: number
+          take_home: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          best_for?: string
+          created_at?: string | null
+          duration?: string
+          format?: string
+          id?: string
+          image_url?: string | null
+          learning_points?: string[]
+          price?: number
+          take_home?: string
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

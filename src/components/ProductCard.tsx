@@ -44,7 +44,7 @@ const ProductCard = ({ id, name, price, image, description, amazon_link }: Produ
       </Link>
       <div className="p-6 flex flex-col flex-1">
         <Link to={`/products/${id}`}>
-          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-800 transition-colors">
+          <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-green-800 transition-colors">
             {name}
           </h3>
         </Link>
