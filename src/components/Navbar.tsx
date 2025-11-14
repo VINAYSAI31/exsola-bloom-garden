@@ -93,72 +93,71 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile Menu */}
-          <div className="md:hidden">
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px]">
-                <nav className="flex flex-col space-y-4 mt-8">
-                  <Link 
-                    to="/" 
-                    className="text-foreground hover:text-accent transition-colors text-lg"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Home
-                  </Link>
-                  <Link 
-                    to="/products" 
-                    className="text-foreground hover:text-accent transition-colors text-lg"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Shop
-                  </Link>
-                  <Link 
-                    to="/blogs" 
-                    className="text-foreground hover:text-accent transition-colors text-lg"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Blogs
-                  </Link>
-                  <Link 
-                    to="/events" 
-                    className="text-foreground hover:text-accent transition-colors text-lg"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Events
-                  </Link>
-                  <Link 
-                    to="/about" 
-                    className="text-foreground hover:text-accent transition-colors text-lg"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    About Us
-                  </Link>
-                  <Link 
-                    to="/contact" 
-                    className="text-foreground hover:text-accent transition-colors text-lg"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Contact
-                  </Link>
-                  <Link 
-                    to="/learn" 
-                    className="text-foreground hover:text-accent transition-colors text-lg"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Learn
-                  </Link>
-                </nav>
-              </SheetContent>
-            </Sheet>
-          </div>
-
           {/* Actions */}
           <div className="flex items-center space-x-2">
+            {/* Mobile Menu - positioned at the end */}
+            <div className="md:hidden ml-auto">
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px]">
+                  <nav className="flex flex-col space-y-4 mt-8">
+                    <Link 
+                      to="/" 
+                      className="text-foreground hover:text-accent transition-colors text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Home
+                    </Link>
+                    <Link 
+                      to="/products" 
+                      className="text-foreground hover:text-accent transition-colors text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Shop
+                    </Link>
+                    <Link 
+                      to="/blogs" 
+                      className="text-foreground hover:text-accent transition-colors text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Blogs
+                    </Link>
+                    <Link 
+                      to="/events" 
+                      className="text-foreground hover:text-accent transition-colors text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Events
+                    </Link>
+                    <Link 
+                      to="/about" 
+                      className="text-foreground hover:text-accent transition-colors text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      About Us
+                    </Link>
+                    <Link 
+                      to="/contact" 
+                      className="text-foreground hover:text-accent transition-colors text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Contact
+                    </Link>
+                    <Link 
+                      to="/learn" 
+                      className="text-foreground hover:text-accent transition-colors text-lg"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Learn
+                    </Link>
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </div>
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
