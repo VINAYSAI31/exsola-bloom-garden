@@ -85,17 +85,14 @@ const Auth = () => {
       return;
     }
 
-    const { data: signUpData, error: signUpError } = await supabase.functions.invoke('auth-signup', {
-      body: {
-        email,
-        password,
-        full_name: fullName,
-        redirectTo: `${window.location.origin}/`,
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: `${window.location.origin}/`,
       }
     });
-
-    // Check for both invocation error and application logic error returned by function
-    const error = signUpError || (signUpData?.error ? new Error(signUpData.error) : null);
 
     setIsLoading(false);
 
@@ -105,11 +102,12 @@ const Auth = () => {
         description: error.message,
         variant: "destructive",
       });
-    } else {
+    } else if (data.user) {
       toast({
         title: "Success",
-        description: "Account created!.",
+        description: "Account created! You can now sign in.",
       });
+      navigate("/");
     }
   };
 

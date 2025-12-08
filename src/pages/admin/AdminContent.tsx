@@ -29,12 +29,12 @@ const AdminContent = () => {
     const fetchSlides = async () => {
         try {
             const { data, error } = await supabase
-                .from("home_slides" as any)
+                .from("home_slides")
                 .select("*")
                 .order("display_order", { ascending: true });
 
             if (error) throw error;
-            setSlides(data || []);
+            setSlides((data as Slide[]) || []);
         } catch (error: any) {
             console.error("Error fetching slides:", error);
 
@@ -106,7 +106,7 @@ const AdminContent = () => {
 
                 // 3. Insert into Database
                 const { error: dbError } = await supabase
-                    .from("home_slides" as any)
+                    .from("home_slides")
                     .insert({
                         image_url: publicUrl,
                         display_order: slides.length + successCount + 1, // logic to append
@@ -171,7 +171,7 @@ const AdminContent = () => {
                     }
 
                     const { error } = await supabase
-                        .from("home_slides" as any)
+                        .from("home_slides")
                         .delete()
                         .eq("id", id);
 
@@ -197,7 +197,7 @@ const AdminContent = () => {
     const saveOrder = async (id: string, order: number) => {
         try {
             const { error } = await supabase
-                .from('home_slides' as any)
+                .from('home_slides')
                 .update({ display_order: order })
                 .eq('id', id);
 
