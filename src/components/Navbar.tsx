@@ -38,6 +38,17 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      if (user) {
+        fetchCartCount(user.id);
+      }
+    };
+
+    window.addEventListener("cart-updated", handleCartUpdate);
+    return () => window.removeEventListener("cart-updated", handleCartUpdate);
+  }, [user]);
+
   const fetchCartCount = async (userId: string) => {
     const { data, error } = await supabase
       .from("cart_items")
@@ -51,8 +62,22 @@ const Navbar = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+
+      // Aggressively clear local storage to prevent lingering sessions
+      for (const key in localStorage) {
+        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch (error) {
+      console.error("Error signing out:", error);
+    } finally {
+      setUser(null);
+      setCartCount(0);
+      navigate("/");
+    }
   };
 
   return (
@@ -105,50 +130,50 @@ const Navbar = () => {
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px]">
                   <nav className="flex flex-col space-y-4 mt-8">
-                    <Link 
-                      to="/" 
+                    <Link
+                      to="/"
                       className="text-foreground hover:text-accent transition-colors text-lg"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Home
                     </Link>
-                    <Link 
-                      to="/products" 
+                    <Link
+                      to="/products"
                       className="text-foreground hover:text-accent transition-colors text-lg"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Shop
                     </Link>
-                    <Link 
-                      to="/blogs" 
+                    <Link
+                      to="/blogs"
                       className="text-foreground hover:text-accent transition-colors text-lg"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Blogs
                     </Link>
-                    <Link 
-                      to="/events" 
+                    <Link
+                      to="/events"
                       className="text-foreground hover:text-accent transition-colors text-lg"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Events
                     </Link>
-                    <Link 
-                      to="/about" 
+                    <Link
+                      to="/about"
                       className="text-foreground hover:text-accent transition-colors text-lg"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       About Us
                     </Link>
-                    <Link 
-                      to="/contact" 
+                    <Link
+                      to="/contact"
                       className="text-foreground hover:text-accent transition-colors text-lg"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Contact
                     </Link>
-                    <Link 
-                      to="/learn" 
+                    <Link
+                      to="/learn"
                       className="text-foreground hover:text-accent transition-colors text-lg"
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -168,20 +193,20 @@ const Navbar = () => {
                 )}
               </Button>
             </Link>
-            
+
             {user ? (
               <>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => navigate("/profile")}
                   title="Profile"
                 >
                   <User className="h-5 w-5" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={handleSignOut}
                   title="Sign Out"
                 >

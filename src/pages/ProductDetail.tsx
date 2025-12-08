@@ -16,6 +16,7 @@ const ProductDetail = () => {
   const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -50,7 +51,7 @@ const ProductDetail = () => {
       .order("display_order", { ascending: true });
 
     const productImages = imageData?.map(img => img.image_url) || [];
-    
+
     // If no images in product_images table, use main image_url
     if (productImages.length === 0 && productData.image_url) {
       productImages.push(productData.image_url);
@@ -61,15 +62,75 @@ const ProductDetail = () => {
     setLoading(false);
   };
 
-  const handleBuyNow = () => {
-    if (product?.amazon_link) {
-      window.open(product.amazon_link, '_blank');
-    } else {
+  const handleBuyNow = async () => {
+    await handleAddToCart(true);
+  };
+
+  const handleAddToCart = async (redirect = false) => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
       toast({
-        title: "Coming Soon",
-        description: "This product will be available for purchase soon!",
-        variant: "default",
+        title: "Please Sign In",
+        description: "You need to be logged in to add items to cart",
+        variant: "destructive",
       });
+      navigate("/auth");
+      return;
+    }
+
+    setAddingToCart(true);
+
+    try {
+      // Check if item already exists in cart for this user
+      const { data: existingItems } = await supabase
+        .from("cart_items")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("product_id", product.id)
+        .single();
+
+      if (existingItems) {
+        // Update quantity
+        const { error } = await supabase
+          .from("cart_items")
+          .update({ quantity: existingItems.quantity + 1 })
+          .eq("id", existingItems.id);
+
+        if (error) throw error;
+      } else {
+        // Insert new item
+        const { error } = await supabase
+          .from("cart_items")
+          .insert({
+            user_id: session.user.id,
+            product_id: product.id,
+            quantity: 1
+          });
+
+        if (error) throw error;
+      }
+
+      // Dispatch event to update navbar cart count
+      window.dispatchEvent(new Event("cart-updated"));
+
+      if (redirect) {
+        navigate("/cart");
+      } else {
+        toast({
+          title: "Success",
+          description: "Item added to cart",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingToCart(false);
     }
   };
 
@@ -116,16 +177,15 @@ const ProductDetail = () => {
               {images.length > 1 && (
                 <div className="flex flex-col gap-3 w-20">
                   {images.map((img, idx) => (
-                    <Card 
+                    <Card
                       key={idx}
-                      className={`overflow-hidden cursor-pointer transition-all ${
-                        selectedImage === img ? "ring-2 ring-accent" : "opacity-60 hover:opacity-100"
-                      }`}
+                      className={`overflow-hidden cursor-pointer transition-all ${selectedImage === img ? "ring-2 ring-accent" : "opacity-60 hover:opacity-100"
+                        }`}
                       onClick={() => setSelectedImage(img)}
                     >
-                      <img 
-                        src={img} 
-                        alt={`${product.name} view ${idx + 1}`} 
+                      <img
+                        src={img}
+                        alt={`${product.name} view ${idx + 1}`}
                         className="w-full h-20 object-cover"
                       />
                     </Card>
@@ -135,9 +195,9 @@ const ProductDetail = () => {
 
               {/* Main image */}
               <Card className="overflow-hidden flex-1">
-                <img 
-                  src={selectedImage || images[0] || product.image_url} 
-                  alt={product.name} 
+                <img
+                  src={selectedImage || images[0] || product.image_url}
+                  alt={product.name}
                   className="w-full h-auto object-cover"
                 />
               </Card>
@@ -173,18 +233,30 @@ const ProductDetail = () => {
 
               {/* Buy Now */}
               <div className="space-y-4">
-                <Button 
-                  size="lg" 
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                  disabled={!product.in_stock}
-                  onClick={handleBuyNow}
-                >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Buy Now on Amazon - ₹{product.price.toFixed(2)}
-                </Button>
-                <p className="text-sm text-muted-foreground text-center">
-                  You will be redirected to Amazon to complete your purchase
-                </p>
+                <div className="flex gap-4">
+                  <Button
+                    size="lg"
+                    className="flex-1 bg-white text-green-800 border-2 border-green-800 hover:bg-green-50"
+                    disabled={!product.in_stock || addingToCart}
+                    onClick={() => handleAddToCart(false)}
+                  >
+                    {addingToCart ? (
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    ) : (
+                      <ShoppingCart className="h-5 w-5 mr-2" />
+                    )}
+                    Add to Cart
+                  </Button>
+
+                  <Button
+                    size="lg"
+                    className="flex-1 bg-green-800 hover:bg-green-900 text-white"
+                    disabled={!product.in_stock || addingToCart}
+                    onClick={handleBuyNow}
+                  >
+                    Buy Now
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

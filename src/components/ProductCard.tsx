@@ -12,55 +12,45 @@ interface ProductCardProps {
   price: number;
   image: string;
   description: string;
-  amazon_link?: string;
+
 }
 
-const ProductCard = ({ id, name, price, image, description, amazon_link }: ProductCardProps) => {
+const ProductCard = ({ id, name, price, image, description }: ProductCardProps) => {
   const { toast } = useToast();
 
-  const handleBuyNow = () => {
-    if (amazon_link) {
-      window.open(amazon_link, '_blank');
-    } else {
-      toast({
-        title: "Coming Soon",
-        description: "This product will be available for purchase soon!",
-        variant: "default",
-      });
-    }
+  const navigate = useNavigate();
+
+  const handleViewDetails = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent parent Link from triggering if nested
+    navigate(`/products/${id}`);
   };
 
   return (
-    <Link to={`/products/${id}`}>
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group h-full flex flex-col">
-      <Link to={`/products/${id}`}>
+    <Link to={`/products/${id}`} className="block h-full">
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group h-full flex flex-col">
         <div className="aspect-square overflow-hidden h-128">
-          <img 
-            src={image} 
-            alt={name} 
+          <img
+            src={image}
+            alt={name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
         </div>
-      </Link>
-      <div className="p-6 flex flex-col flex-1">
-        <Link to={`/products/${id}`}>
+        <div className="p-6 flex flex-col flex-1">
           <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-green-800 transition-colors">
             {name}
           </h3>
-        </Link>
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">{description}</p>
-        <div className="mt-auto">
-          <p className="text-2xl font-bold text-gray-900 mb-4">₹{price.toFixed(2)}</p>
-          <button 
-            className="w-full bg-green-800 text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-green-900 transition-colors flex items-center justify-center"
-            onClick={handleBuyNow}
-          >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Buy Now
-          </button>
+          <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">{description}</p>
+          <div className="mt-auto">
+            <p className="text-2xl font-bold text-gray-900 mb-4">₹{price.toFixed(2)}</p>
+            <div
+              className="w-full bg-green-800 text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-green-900 transition-colors flex items-center justify-center cursor-pointer"
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              View Details
+            </div>
+          </div>
         </div>
       </div>
-    </div>
     </Link>
   );
 };

@@ -1,26 +1,64 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  Package, 
-  Users, 
-  ShoppingCart, 
+import {
+  LayoutDashboard,
+  Package,
+  Users,
+  ShoppingCart,
   Settings,
   LogOut,
   Home,
   Menu,
   X,
   BookOpen,
-  Briefcase
+  Briefcase,
+  Image
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import Swal from "sweetalert2";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    checkAdminUser();
+  }, []);
+
+  const checkAdminUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      navigate("/auth");
+      return;
+    }
+    // Check if user has admin role
+    console.log("Checking admin privileges for:", session.user.email);
+
+    const { data: roles, error } = await supabase
+      .from("user_roles")
+      .select("*") // Select all columns to debug
+      .eq("user_id", session.user.id);
+
+    console.log("Roles found:", roles);
+    console.log("Error if any:", error);
+
+    const hasAdminRole = roles?.some(r => r.role === 'admin');
+
+    if (error || !hasAdminRole) {
+      console.error("Access denied: User is not an admin. Roles found:", roles);
+      navigate("/");
+      return;
+    }
+
+    console.log("Access granted!");
+    setIsAdmin(true);
+    setIsLoading(false);
+  };
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -33,14 +71,26 @@ const AdminLayout = () => {
     });
 
     if (result.isConfirmed) {
-      await supabase.auth.signOut();
-      navigate("/");
+      try {
+        await supabase.auth.signOut();
+        // Aggressively clear local storage
+        for (const key in localStorage) {
+          if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+            localStorage.removeItem(key);
+          }
+        }
+      } catch (error) {
+        console.error("Error during logout:", error);
+      } finally {
+        navigate("/");
+      }
     }
   };
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
     { icon: Package, label: "Products", path: "/admin/products" },
+    { icon: Image, label: "Home Content", path: "/admin/content" },
     { icon: BookOpen, label: "Blogs", path: "/admin/blogs" },
     { icon: Briefcase, label: "Workshops", path: "/admin/workshops" },
     { icon: Briefcase, label: "Events", path: "/admin/events" },
@@ -56,6 +106,18 @@ const AdminLayout = () => {
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return null; // Don't render anything while redirecting
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -76,7 +138,7 @@ const AdminLayout = () => {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-black/50 z-40"
           onClick={closeMobileMenu}
         />
@@ -99,11 +161,10 @@ const AdminLayout = () => {
             <Link key={item.path} to={item.path} onClick={closeMobileMenu}>
               <Button
                 variant="ghost"
-                className={`w-full justify-start ${
-                  isActive(item.path)
-                    ? "bg-accent text-accent-foreground hover:bg-accent/90"
-                    : "text-primary-foreground hover:bg-primary-foreground/10"
-                }`}
+                className={`w-full justify-start ${isActive(item.path)
+                  ? "bg-accent text-accent-foreground hover:bg-accent/90"
+                  : "text-primary-foreground hover:bg-primary-foreground/10"
+                  }`}
               >
                 <item.icon className="mr-3 h-5 w-5" />
                 {item.label}

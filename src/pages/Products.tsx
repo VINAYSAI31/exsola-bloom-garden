@@ -143,7 +143,7 @@ const Products = () => {
                   </div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-4">Coming Soon</h2>
                   <p className="text-gray-600 mb-6">
-                    {selectedCategories.length > 0 
+                    {selectedCategories.length > 0
                       ? `We're preparing amazing ${selectedCategories[0].toLowerCase()} products for you. Stay tuned for updates!`
                       : "We're preparing amazing products for you. Stay tuned for updates!"
                     }
@@ -156,16 +156,15 @@ const Products = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">{filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    id={product.id}
-                    name={product.name}
-                    price={product.price}
-                    image={product.image_url}
-                    description={product.description}
-                    amazon_link={product.amazon_link}
-                  />
-                ))}
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  image={product.image_url}
+                  description={product.description}
+                />
+              ))}
               </div>
             )}
           </div>

@@ -102,12 +102,13 @@ const Cart = () => {
         title: "Success",
         description: "Item removed from cart",
       });
+      window.dispatchEvent(new Event("cart-updated"));
       if (user?.id) fetchCart(user.id);
     }
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + Number(item.products.price) * item.quantity, 0);
-  const shipping = cartItems.length > 0 ? 5.99 : 0;
+  const shipping = cartItems.length > 0 ? 49 : 0;
   const total = subtotal + shipping;
 
   return (
@@ -142,57 +143,57 @@ const Cart = () => {
               {/* Cart Items */}
               <div className="lg:col-span-2 space-y-4">
                 {cartItems.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <p className="text-muted-foreground mb-4">Your cart is empty</p>
-                  <Link to="/products">
-                    <Button className="bg-accent hover:bg-accent/90">
-                      Continue Shopping
-                    </Button>
-                  </Link>
-                </Card>
-              ) : (
-                cartItems.map((item) => (
-                  <Card key={item.id} className="p-6">
-                    <div className="flex gap-6">
-                      <img 
-                        src={item.products.image_url || "/placeholder.svg"} 
-                        alt={item.products.name} 
-                        className="w-24 h-24 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-2">{item.products.name}</h3>
-                        <p className="text-accent font-bold mb-4">${Number(item.products.price).toFixed(2)}</p>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center border rounded-lg">
-                            <Button 
-                              variant="ghost" 
+                  <Card className="p-8 text-center">
+                    <p className="text-muted-foreground mb-4">Your cart is empty</p>
+                    <Link to="/products">
+                      <Button className="bg-accent hover:bg-accent/90">
+                        Continue Shopping
+                      </Button>
+                    </Link>
+                  </Card>
+                ) : (
+                  cartItems.map((item) => (
+                    <Card key={item.id} className="p-6">
+                      <div className="flex gap-6">
+                        <img
+                          src={item.products.image_url || "/placeholder.svg"}
+                          alt={item.products.name}
+                          className="w-24 h-24 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg mb-2">{item.products.name}</h3>
+                          <p className="text-accent font-bold mb-4">₹{Number(item.products.price).toFixed(2)}</p>
+
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center border rounded-lg">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <span className="px-4 py-2 font-semibold">{item.quantity}</span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+
+                            <Button
+                              variant="ghost"
                               size="icon"
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="text-destructive"
+                              onClick={() => removeItem(item.id)}
                             >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="px-4 py-2 font-semibold">{item.quantity}</span>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            >
-                              <Plus className="h-4 w-4" />
+                              <Trash2 className="h-5 w-5" />
                             </Button>
                           </div>
-                          
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-destructive"
-                            onClick={() => removeItem(item.id)}
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </Button>
                         </div>
                       </div>
-                    </div>
                     </Card>
                   ))
                 )}
@@ -200,33 +201,33 @@ const Cart = () => {
 
               {/* Order Summary */}
               <div>
-              <Card className="p-6 sticky top-24">
-                <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
-                
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-semibold">${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-semibold">${shipping.toFixed(2)}</span>
-                  </div>
-                  <div className="border-t pt-4 flex justify-between text-lg">
-                    <span className="font-bold">Total</span>
-                    <span className="font-bold text-accent">${total.toFixed(2)}</span>
-                  </div>
-                </div>
+                <Card className="p-6 sticky top-24">
+                  <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
 
-                <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground mb-4">
-                  Proceed to Checkout
-                </Button>
-                
-                <Link to="/products">
-                  <Button variant="outline" className="w-full">
-                    Continue Shopping
+                  <div className="space-y-4 mb-6">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Shipping</span>
+                      <span className="font-semibold">₹{shipping.toFixed(2)}</span>
+                    </div>
+                    <div className="border-t pt-4 flex justify-between text-lg">
+                      <span className="font-bold">Total</span>
+                      <span className="font-bold text-accent">₹{total.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground mb-4">
+                    <Link to="/checkout">Proceed to Checkout</Link>
                   </Button>
-                </Link>
+
+                  <Link to="/products">
+                    <Button variant="outline" className="w-full">
+                      Continue Shopping
+                    </Button>
+                  </Link>
                 </Card>
               </div>
             </div>

@@ -19,7 +19,7 @@ interface Product {
   category: string;
   in_stock: boolean;
   image_url: string;
-  amazon_link?: string;
+
 }
 
 const AdminProducts = () => {
@@ -36,7 +36,6 @@ const AdminProducts = () => {
     description: "",
     price: "",
     category: "",
-    amazon_link: "",
     in_stock: true,
     images: [] as string[],
   });
@@ -61,7 +60,7 @@ const AdminProducts = () => {
   const handleOpenDialog = async (product?: Product) => {
     if (product) {
       setEditingProduct(product);
-      
+
       // Fetch additional images
       const { data: additionalImages } = await supabase
         .from("product_images")
@@ -79,7 +78,6 @@ const AdminProducts = () => {
         description: product.description || "",
         price: product.price.toString(),
         category: product.category || "",
-        amazon_link: product.amazon_link || "",
         in_stock: product.in_stock,
         images: allImages,
       });
@@ -90,7 +88,6 @@ const AdminProducts = () => {
         description: "",
         price: "",
         category: "",
-        amazon_link: "",
         in_stock: true,
         images: [],
       });
@@ -205,7 +202,6 @@ const AdminProducts = () => {
       description: formData.description,
       price: parseFloat(formData.price),
       category: formData.category,
-      amazon_link: formData.amazon_link || null,
       in_stock: formData.in_stock,
       image_url: formData.images[0],
     };
@@ -370,15 +366,14 @@ const AdminProducts = () => {
                       />
                     </TableCell>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>${product.price.toFixed(2)}</TableCell>
+                    <TableCell>₹{product.price.toFixed(2)}</TableCell>
                     <TableCell>{product.category || "N/A"}</TableCell>
                     <TableCell>
                       <span
-                        className={`inline-block px-2 py-1 rounded text-xs ${
-                          product.in_stock
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                        className={`inline-block px-2 py-1 rounded text-xs ${product.in_stock
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                          }`}
                       >
                         {product.in_stock ? "In Stock" : "Out of Stock"}
                       </span>
@@ -460,21 +455,7 @@ const AdminProducts = () => {
                 />
               </div>
             </div>
-            <div>
-              <Label htmlFor="amazon_link">Amazon Product Link</Label>
-              <Input
-                id="amazon_link"
-                type="url"
-                placeholder="https://amazon.in/dp/..."
-                value={formData.amazon_link}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, amazon_link: e.target.value }))
-                }
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Customers will be redirected to this Amazon link when they click "Buy Now"
-              </p>
-            </div>
+
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -537,16 +518,16 @@ const AdminProducts = () => {
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-4">
-              <Button 
+              <Button
                 type="button"
-                variant="outline" 
+                variant="outline"
                 onClick={() => setIsDialogOpen(false)}
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="button"
-                onClick={handleSubmit} 
+                onClick={handleSubmit}
                 className="bg-accent hover:bg-accent/90"
                 disabled={uploading}
               >

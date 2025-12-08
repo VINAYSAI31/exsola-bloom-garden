@@ -12,6 +12,7 @@ import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
+import Checkout from "./pages/Checkout";
 import HowWeMakePage from "./pages/HowWeMakePage";
 import Blogs from "./pages/Blogs";
 import Learn from "./pages/Learn";
@@ -31,6 +32,7 @@ import AdminEvents from "./pages/admin/AdminEvents";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminContent from "./pages/admin/AdminContent";
 import NotFound from "./pages/NotFound";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -71,17 +73,19 @@ const App = () => (
           <Route path="/store-location" element={<StoreLocation />} />
           <Route path="/events" element={<Events />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
-          
+
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="products" element={<AdminProducts />} />
-          <Route path="blogs" element={<AdminBlogs />} />
-          <Route path="workshops" element={<AdminWorkshops />} />
-          <Route path="events" element={<AdminEvents />} />
-          <Route path="users" element={<AdminUsers />} />
+            <Route path="content" element={<AdminContent />} />
+            <Route path="blogs" element={<AdminBlogs />} />
+            <Route path="workshops" element={<AdminWorkshops />} />
+            <Route path="events" element={<AdminEvents />} />
+            <Route path="users" element={<AdminUsers />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>

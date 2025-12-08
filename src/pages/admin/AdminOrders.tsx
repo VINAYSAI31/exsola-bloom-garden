@@ -145,7 +145,7 @@ const AdminOrders = () => {
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">
-                      ${order.total.toFixed(2)}
+                      ₹{order.total.toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <span className="inline-block px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
@@ -228,9 +228,9 @@ const AdminOrders = () => {
                           </div>
                         </TableCell>
                         <TableCell>{item.quantity}</TableCell>
-                        <TableCell>${item.price.toFixed(2)}</TableCell>
+                        <TableCell>₹{item.price.toFixed(2)}</TableCell>
                         <TableCell>
-                          ${(item.quantity * item.price).toFixed(2)}
+                          ₹{(item.quantity * item.price).toFixed(2)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -241,7 +241,7 @@ const AdminOrders = () => {
               <div className="border-t pt-4">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${selectedOrder.total.toFixed(2)}</span>
+                  <span>₹{selectedOrder.total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
