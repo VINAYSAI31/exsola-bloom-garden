@@ -151,6 +151,27 @@ export type Database = {
         }
         Relationships: []
       }
+      home_slides: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -194,6 +215,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          razorpay_order_id: string | null
           status: string | null
           total: number
           user_id: string
@@ -201,6 +223,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          razorpay_order_id?: string | null
           status?: string | null
           total: number
           user_id: string
@@ -208,6 +231,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          razorpay_order_id?: string | null
           status?: string | null
           total?: number
           user_id?: string
