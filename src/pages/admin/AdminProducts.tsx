@@ -284,16 +284,26 @@ const AdminProducts = () => {
       confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const { error } = await supabase
-          .from("products")
-          .delete()
-          .eq("id", product.id);
+        try {
+          // First delete product images
+          await supabase
+            .from("product_images")
+            .delete()
+            .eq("product_id", product.id);
 
-        if (error) {
-          Swal.fire("Error!", "Failed to delete product", "error");
-        } else {
+          // Then delete the product
+          const { error } = await supabase
+            .from("products")
+            .delete()
+            .eq("id", product.id);
+
+          if (error) throw error;
+          
           Swal.fire("Deleted!", "Product has been deleted.", "success");
           fetchProducts();
+        } catch (error: any) {
+          console.error("Delete error:", error);
+          Swal.fire("Error!", error.message || "Failed to delete product. It may be referenced in existing orders.", "error");
         }
       }
     });

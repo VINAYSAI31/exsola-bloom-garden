@@ -6,12 +6,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Swal from "sweetalert2";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 const AdminSettings = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [shippingFee, setShippingFee] = useState("49");
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState("500");
 
   useEffect(() => {
     const getUser = async () => {
@@ -21,7 +25,54 @@ const AdminSettings = () => {
       }
     };
     getUser();
+    fetchSettings();
   }, []);
+
+  const fetchSettings = async () => {
+    setSettingsLoading(true);
+    const { data, error } = await supabase
+      .from("store_settings")
+      .select("*");
+
+    if (!error && data) {
+      const shippingSetting = data.find(s => s.key === "shipping_charge");
+      const freeShippingSetting = data.find(s => s.key === "free_shipping_threshold");
+      
+      if (shippingSetting) setShippingFee(shippingSetting.value);
+      if (freeShippingSetting) setFreeShippingThreshold(freeShippingSetting.value);
+    }
+    setSettingsLoading(false);
+  };
+
+  const handleSaveShipping = async () => {
+    setIsLoading(true);
+    
+    const { error: shippingError } = await supabase
+      .from("store_settings")
+      .update({ value: shippingFee, updated_at: new Date().toISOString() })
+      .eq("key", "shipping_charge");
+
+    const { error: thresholdError } = await supabase
+      .from("store_settings")
+      .update({ value: freeShippingThreshold, updated_at: new Date().toISOString() })
+      .eq("key", "free_shipping_threshold");
+
+    setIsLoading(false);
+
+    if (shippingError || thresholdError) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to save shipping settings",
+        icon: "error",
+      });
+    } else {
+      Swal.fire({
+        title: "Success!",
+        text: "Shipping settings saved successfully",
+        icon: "success",
+      });
+    }
+  };
 
   const handleSave = () => {
     Swal.fire({
@@ -203,25 +254,47 @@ const AdminSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle>Shipping Settings</CardTitle>
-            <CardDescription>Configure shipping options</CardDescription>
+            <CardDescription>Configure shipping options - These values are used during checkout</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="shipping-fee">Standard Shipping Fee</Label>
-              <Input id="shipping-fee" type="number" step="0.01" defaultValue="5.99" />
-            </div>
-            <div>
-              <Label htmlFor="free-shipping">Free Shipping Threshold</Label>
-              <Input
-                id="free-shipping"
-                type="number"
-                step="0.01"
-                defaultValue="50.00"
-              />
-            </div>
-            <Button onClick={handleSave} className="bg-accent hover:bg-accent/90">
-              Save Changes
-            </Button>
+            {settingsLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : (
+              <>
+                <div>
+                  <Label htmlFor="shipping-fee">Standard Shipping Fee (₹)</Label>
+                  <Input 
+                    id="shipping-fee" 
+                    type="number" 
+                    step="0.01" 
+                    value={shippingFee}
+                    onChange={(e) => setShippingFee(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="free-shipping">Free Shipping Threshold (₹)</Label>
+                  <Input
+                    id="free-shipping"
+                    type="number"
+                    step="0.01"
+                    value={freeShippingThreshold}
+                    onChange={(e) => setFreeShippingThreshold(e.target.value)}
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Orders above this amount will get free shipping
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleSaveShipping} 
+                  className="bg-accent hover:bg-accent/90"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Saving..." : "Save Shipping Settings"}
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
 
