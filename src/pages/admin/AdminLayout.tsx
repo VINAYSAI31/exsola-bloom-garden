@@ -11,7 +11,8 @@ import {
   X,
   BookOpen,
   Briefcase,
-  Image
+  Image,
+  Ticket
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -96,6 +97,7 @@ const AdminLayout = () => {
     { icon: Briefcase, label: "Events", path: "/admin/events" },
     { icon: Users, label: "Users", path: "/admin/users" },
     { icon: ShoppingCart, label: "Orders", path: "/admin/orders" },
+    { icon: Ticket, label: "Coupons", path: "/admin/coupons" },
     { icon: Settings, label: "Settings", path: "/admin/settings" },
   ];
 

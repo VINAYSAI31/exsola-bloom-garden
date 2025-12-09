@@ -33,6 +33,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminContent from "./pages/admin/AdminContent";
+import AdminCoupons from "./pages/admin/AdminCoupons";
 import NotFound from "./pages/NotFound";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="events" element={<AdminEvents />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="coupons" element={<AdminCoupons />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 
