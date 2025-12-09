@@ -25,12 +25,36 @@ const Cart = () => {
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
 
+  // Shipping settings from DB
+  const [shippingCharge, setShippingCharge] = useState(49);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(500);
+
   useEffect(() => {
     checkUser();
+    fetchShippingSettings();
   }, []);
 
+  const fetchShippingSettings = async () => {
+    const { data, error } = await supabase
+      .from("store_settings")
+      .select("*");
+
+    if (!error && data) {
+      const shippingSetting = data.find((s) => s.key === "shipping_charge");
+      const thresholdSetting = data.find(
+        (s) => s.key === "free_shipping_threshold"
+      );
+
+      if (shippingSetting) setShippingCharge(parseFloat(shippingSetting.value));
+      if (thresholdSetting)
+        setFreeShippingThreshold(parseFloat(thresholdSetting.value));
+    }
+  };
+
   const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     setUser(session?.user || null);
     if (session?.user) {
       fetchCart(session.user.id);
@@ -42,7 +66,8 @@ const Cart = () => {
   const fetchCart = async (userId: string) => {
     const { data, error } = await supabase
       .from("cart_items")
-      .select(`
+      .select(
+        `
         id,
         product_id,
         quantity,
@@ -51,7 +76,8 @@ const Cart = () => {
           price,
           image_url
         )
-      `)
+      `
+      )
       .eq("user_id", userId);
 
     if (error) {
@@ -107,8 +133,19 @@ const Cart = () => {
     }
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + Number(item.products.price) * item.quantity, 0);
-  const shipping = cartItems.length > 0 ? 49 : 0;
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + Number(item.products.price) * item.quantity,
+    0
+  );
+
+  // Dynamic shipping from DB + free shipping threshold
+  const shipping =
+    cartItems.length > 0
+      ? subtotal >= freeShippingThreshold
+        ? 0
+        : shippingCharge
+      : 0;
+
   const total = subtotal + shipping;
 
   return (
@@ -121,9 +158,12 @@ const Cart = () => {
           {!user ? (
             <Card className="p-12 text-center">
               <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h2 className="text-2xl font-semibold mb-2">Your cart is waiting</h2>
+              <h2 className="text-2xl font-semibold mb-2">
+                Your cart is waiting
+              </h2>
               <p className="text-muted-foreground mb-6">
-                Sign in to your account or create a new account to start shopping
+                Sign in to your account or create a new account to start
+                shopping
               </p>
               <div className="flex gap-4 justify-center">
                 <Button asChild className="bg-accent hover:bg-accent/90">
@@ -144,7 +184,9 @@ const Cart = () => {
               <div className="lg:col-span-2 space-y-4">
                 {cartItems.length === 0 ? (
                   <Card className="p-8 text-center">
-                    <p className="text-muted-foreground mb-4">Your cart is empty</p>
+                    <p className="text-muted-foreground mb-4">
+                      Your cart is empty
+                    </p>
                     <Link to="/products">
                       <Button className="bg-accent hover:bg-accent/90">
                         Continue Shopping
@@ -161,23 +203,33 @@ const Cart = () => {
                           className="w-24 h-24 object-cover rounded"
                         />
                         <div className="flex-1">
-                          <h3 className="font-semibold text-lg mb-2">{item.products.name}</h3>
-                          <p className="text-accent font-bold mb-4">₹{Number(item.products.price).toFixed(2)}</p>
+                          <h3 className="font-semibold text-lg mb-2">
+                            {item.products.name}
+                          </h3>
+                          <p className="text-accent font-bold mb-4">
+                            ₹{Number(item.products.price).toFixed(2)}
+                          </p>
 
                           <div className="flex items-center justify-between">
                             <div className="flex items-center border rounded-lg">
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                onClick={() =>
+                                  updateQuantity(item.id, item.quantity - 1)
+                                }
                               >
                                 <Minus className="h-4 w-4" />
                               </Button>
-                              <span className="px-4 py-2 font-semibold">{item.quantity}</span>
+                              <span className="px-4 py-2 font-semibold">
+                                {item.quantity}
+                              </span>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                onClick={() =>
+                                  updateQuantity(item.id, item.quantity + 1)
+                                }
                               >
                                 <Plus className="h-4 w-4" />
                               </Button>
@@ -207,19 +259,38 @@ const Cart = () => {
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
+                      <span className="font-semibold">
+                        ₹{subtotal.toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Shipping</span>
-                      <span className="font-semibold">₹{shipping.toFixed(2)}</span>
+                      <span className="font-semibold">
+                        {shipping === 0
+                          ? "FREE"
+                          : `₹${shipping.toFixed(2)}`}
+                      </span>
                     </div>
+                    {cartItems.length > 0 &&
+                      subtotal < freeShippingThreshold && (
+                        <p className="text-xs text-muted-foreground">
+                          Add ₹
+                          {(freeShippingThreshold - subtotal).toFixed(2)} more
+                          for free shipping
+                        </p>
+                      )}
                     <div className="border-t pt-4 flex justify-between text-lg">
                       <span className="font-bold">Total</span>
-                      <span className="font-bold text-accent">₹{total.toFixed(2)}</span>
+                      <span className="font-bold text-accent">
+                        ₹{total.toFixed(2)}
+                      </span>
                     </div>
                   </div>
 
-                  <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground mb-4">
+                  <Button
+                    asChild
+                    className="w-full bg-accent hover:bg-accent/90 text-accent-foreground mb-4"
+                  >
                     <Link to="/checkout">Proceed to Checkout</Link>
                   </Button>
 
