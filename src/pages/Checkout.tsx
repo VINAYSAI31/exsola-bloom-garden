@@ -31,6 +31,8 @@ const Checkout = () => {
     const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string>("new");
     const [isAddressLoading, setIsAddressLoading] = useState(true);
+    const [shippingCharge, setShippingCharge] = useState(49);
+    const [freeShippingThreshold, setFreeShippingThreshold] = useState(500);
 
     // Load Razorpay Script
     useEffect(() => {
@@ -56,7 +58,22 @@ const Checkout = () => {
 
     useEffect(() => {
         checkUser();
+        fetchShippingSettings();
     }, []);
+
+    const fetchShippingSettings = async () => {
+        const { data, error } = await supabase
+            .from("store_settings")
+            .select("*");
+
+        if (!error && data) {
+            const shippingSetting = data.find(s => s.key === "shipping_charge");
+            const thresholdSetting = data.find(s => s.key === "free_shipping_threshold");
+            
+            if (shippingSetting) setShippingCharge(parseFloat(shippingSetting.value));
+            if (thresholdSetting) setFreeShippingThreshold(parseFloat(thresholdSetting.value));
+        }
+    };
 
     const checkUser = async () => {
         const { data: { session } } = await supabase.auth.getSession();
@@ -127,6 +144,10 @@ const Checkout = () => {
         setFormData(prev => ({ ...prev, [id]: value }));
     };
 
+    // Calculate actual shipping based on threshold
+    const actualShipping = subtotal >= freeShippingThreshold ? 0 : shippingCharge;
+    const totalAmount = subtotal + actualShipping;
+
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -142,9 +163,6 @@ const Checkout = () => {
         setProcessing(true);
 
         try {
-            const shipping = 49; // Standard shipping
-            const totalAmount = subtotal + shipping;
-
             // 1. Check/Create Address Record
             let addressId = null;
 
@@ -443,7 +461,7 @@ const Checkout = () => {
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <Label htmlFor="zip_code">ZIP / Postal Code</Label>
+                                                    <Label htmlFor="zip_code">ZIP Code</Label>
                                                     <Input
                                                         id="zip_code"
                                                         required
@@ -455,35 +473,27 @@ const Checkout = () => {
                                                     <Label htmlFor="country">Country</Label>
                                                     <Input
                                                         id="country"
-                                                        required
                                                         value={formData.country}
                                                         onChange={handleInputChange}
-                                                        disabled
                                                     />
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    <div className="pt-6">
-                                        <Label className="text-lg font-semibold mb-4 block">Payment Method</Label>
-                                        <div className="grid gap-4">
-                                            <div className="flex items-center space-x-4 border p-4 rounded-lg cursor-pointer hover:bg-accent/5 transition-colors"
-                                                onClick={() => setFormData(prev => ({ ...prev, payment_method: 'online' }))}>
-                                                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-100">
-                                                    <Banknote className="h-5 w-5 text-blue-800" />
+                                    {/* Payment Method */}
+                                    <div className="space-y-4 border-t pt-4">
+                                        <Label className="text-lg font-semibold">Payment Method</Label>
+                                        <div className="space-y-2">
+                                            <div
+                                                className={`flex items-center space-x-4 border p-4 rounded-lg cursor-pointer transition-colors ${formData.payment_method === 'online' ? 'border-primary bg-primary/5' : 'hover:bg-accent/5'}`}
+                                                onClick={() => setFormData(prev => ({ ...prev, payment_method: 'online' }))}
+                                            >
+                                                <div className={`h-4 w-4 rounded-full border border-primary flex items-center justify-center ${formData.payment_method === 'online' ? 'bg-primary' : ''}`}>
+                                                    {formData.payment_method === 'online' && <div className="h-2 w-2 rounded-full bg-white" />}
                                                 </div>
-                                                <div className="flex-1">
-                                                    <p className="font-medium">Pay Online (Razorpay)</p>
-                                                    <p className="text-sm text-muted-foreground">Credit/Debit Card, UPI, NetBanking</p>
-                                                </div>
-                                                <input
-                                                    type="radio"
-                                                    name="payment_method"
-                                                    checked={formData.payment_method === 'online'}
-                                                    onChange={() => { }}
-                                                    className="accent-green-800 h-4 w-4"
-                                                />
+                                                <Banknote className="h-5 w-5 text-gray-600" />
+                                                <span className="font-medium">Pay Online (UPI/Card/NetBanking)</span>
                                             </div>
                                         </div>
                                     </div>
@@ -498,56 +508,93 @@ const Checkout = () => {
                             <CardHeader>
                                 <CardTitle>Order Summary</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    {cartItems.map((item) => (
-                                        <div key={item.id} className="flex justify-between items-center text-sm">
-                                            <span>{item.products.name} x {item.quantity}</span>
-                                            <span>₹{(Number(item.products.price) * item.quantity).toFixed(2)}</span>
+                            <CardContent className="space-y-4">
+                                {cartItems.map((item) => (
+                                    <div key={item.id} className="flex items-center gap-4">
+                                        <img
+                                            src={item.products.image_url}
+                                            alt={item.products.name}
+                                            className="w-16 h-16 object-cover rounded"
+                                        />
+                                        <div className="flex-1">
+                                            <p className="font-medium">{item.products.name}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Qty: {item.quantity}
+                                            </p>
                                         </div>
-                                    ))}
-
-                                    <div className="border-t pt-4 space-y-2">
-                                        <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Subtotal</span>
-                                            <span>₹{subtotal.toFixed(2)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Shipping</span>
-                                            <span>₹49.00</span>
-                                        </div>
-                                        <div className="flex justify-between font-bold text-lg pt-2">
-                                            <span>Total</span>
-                                            <span className="text-green-600">₹{(subtotal + 49).toFixed(2)}</span>
-                                        </div>
+                                        <p className="font-semibold">
+                                            ₹{(Number(item.products.price) * item.quantity).toFixed(2)}
+                                        </p>
                                     </div>
+                                ))}
 
-                                    <Button
-                                        type="submit"
-                                        form="checkout-form"
-                                        className="w-full mt-6 bg-green-800 hover:bg-green-900 text-white"
-                                        disabled={processing}
-                                    >
-                                        {processing ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Processing Order...
-                                            </>
-                                        ) : (
-                                            "Pay Now"
-                                        )}
-                                    </Button>
-                                    <p className="text-xs text-center text-muted-foreground mt-2">
-                                        This is a simulated payment. No real money will be charged.
-                                    </p>
+                                <div className="border-t pt-4 space-y-2">
+                                    <div className="flex justify-between">
+                                        <span>Subtotal</span>
+                                        <span>₹{subtotal.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="flex items-center gap-1">
+                                            <Truck className="h-4 w-4" /> Shipping
+                                        </span>
+                                        <span>
+                                            {actualShipping === 0 ? (
+                                                <span className="text-green-600">FREE</span>
+                                            ) : (
+                                                `₹${actualShipping.toFixed(2)}`
+                                            )}
+                                        </span>
+                                    </div>
+                                    {subtotal < freeShippingThreshold && (
+                                        <p className="text-xs text-muted-foreground">
+                                            Add ₹{(freeShippingThreshold - subtotal).toFixed(2)} more for free shipping
+                                        </p>
+                                    )}
+                                    <div className="flex justify-between font-bold text-lg border-t pt-2">
+                                        <span>Total</span>
+                                        <span>₹{totalAmount.toFixed(2)}</span>
+                                    </div>
                                 </div>
+
+                                <Button
+                                    type="submit"
+                                    form="checkout-form"
+                                    className="w-full bg-accent hover:bg-accent/90"
+                                    disabled={processing}
+                                >
+                                    {processing ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        "Pay Now"
+                                    )}
+                                </Button>
                             </CardContent>
                         </Card>
                     </div>
                 </div>
-            </main >
+            </main>
             <Footer />
-        </div >
+
+            {/* COD Alert */}
+            <AlertDialog open={showCODAlert} onOpenChange={setShowCODAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Cash on Delivery</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Cash on Delivery is currently not available. Please select online payment.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction onClick={() => setShowCODAlert(false)}>
+                            OK
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </div>
     );
 };
 

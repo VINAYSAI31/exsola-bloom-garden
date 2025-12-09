@@ -3,12 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Trash2, ShoppingCart } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import Swal from "sweetalert2";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface UserProfile {
   id: string;
@@ -18,12 +19,26 @@ interface UserProfile {
   created_at: string;
 }
 
+interface CartItem {
+  id: string;
+  quantity: number;
+  products: {
+    id: string;
+    name: string;
+    price: number;
+    image_url: string;
+  };
+}
+
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCartDialogOpen, setIsCartDialogOpen] = useState(false);
   const [viewingUser, setViewingUser] = useState<UserProfile | null>(null);
+  const [userCart, setUserCart] = useState<CartItem[]>([]);
+  const [cartLoading, setCartLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -46,6 +61,33 @@ const AdminUsers = () => {
   const handleView = (user: UserProfile) => {
     setViewingUser(user);
     setIsDialogOpen(true);
+  };
+
+  const handleViewCart = async (user: UserProfile) => {
+    setViewingUser(user);
+    setCartLoading(true);
+    setIsCartDialogOpen(true);
+
+    const { data, error } = await supabase
+      .from("cart_items")
+      .select(`
+        id,
+        quantity,
+        products (
+          id,
+          name,
+          price,
+          image_url
+        )
+      `)
+      .eq("user_id", user.id);
+
+    if (!error && data) {
+      setUserCart(data as CartItem[]);
+    } else {
+      setUserCart([]);
+    }
+    setCartLoading(false);
   };
 
   const handleDelete = (user: UserProfile) => {
@@ -80,19 +122,21 @@ const AdminUsers = () => {
       u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const cartTotal = userCart.reduce((sum, item) => sum + (item.products?.price * item.quantity), 0);
+
   return (
     <div className="p-8 space-y-8">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-bold mb-2">Users</h1>
-          <p className="text-muted-foreground">Manage customer accounts</p>
+          <p className="text-muted-foreground">Manage customer accounts ({users.length} total users)</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>All Users</CardTitle>
-          <CardDescription>View and manage registered users</CardDescription>
+          <CardDescription>View and manage all registered users including their cart</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -143,13 +187,23 @@ const AdminUsers = () => {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleView(user)}
+                        title="View Details"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
+                        onClick={() => handleViewCart(user)}
+                        title="View Cart"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => handleDelete(user)}
+                        title="Delete User"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -162,6 +216,7 @@ const AdminUsers = () => {
         </CardContent>
       </Card>
 
+      {/* User Details Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -186,6 +241,52 @@ const AdminUsers = () => {
                 <p className="text-sm mt-1">
                   {new Date(viewingUser.created_at).toLocaleString()}
                 </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* User Cart Dialog */}
+      <Dialog open={isCartDialogOpen} onOpenChange={setIsCartDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              Cart for {viewingUser?.full_name || viewingUser?.email || "User"}
+            </DialogTitle>
+          </DialogHeader>
+          {cartLoading ? (
+            <div className="text-center py-8">Loading cart...</div>
+          ) : userCart.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              This user's cart is empty
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {userCart.map((item) => (
+                <div key={item.id} className="flex items-center gap-4 border rounded-lg p-3">
+                  <img
+                    src={item.products?.image_url}
+                    alt={item.products?.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium">{item.products?.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      ₹{item.products?.price} x {item.quantity}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <Badge variant="secondary">Qty: {item.quantity}</Badge>
+                    <p className="font-semibold mt-1">
+                      ₹{(item.products?.price * item.quantity).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <div className="border-t pt-4 flex justify-between items-center">
+                <span className="font-semibold">Cart Total:</span>
+                <span className="text-xl font-bold text-accent">₹{cartTotal.toFixed(2)}</span>
               </div>
             </div>
           )}

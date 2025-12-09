@@ -89,7 +89,7 @@ const Profile = () => {
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
-    setOrders(data);
+    setOrders(data || []);
   }
 
 
@@ -191,6 +191,12 @@ const Profile = () => {
       });
       fetchProfile(user.id);
     }
+  };
+
+  // Generate display order number (0001, 0002, etc.)
+  const getOrderDisplayNumber = (index: number, totalOrders: number) => {
+    const orderNumber = totalOrders - index;
+    return String(orderNumber).padStart(4, '0');
   };
 
   return (
@@ -377,17 +383,20 @@ const Profile = () => {
                     {orders.filter(o => o.order_items.length > 0).length === 0 ? (
                       <p className="text-center text-muted-foreground py-8">No orders yet</p>
                     ) : (
-                      orders.filter(o => o.order_items.length > 0).map((order) => {
+                      orders.filter(o => o.order_items.length > 0).map((order, index) => {
                         const itemCount = order.order_items.reduce((sum, item) => sum + item.quantity, 0);
                         const displayStatus = order.status === 'pending_payment' ? 'Payment Pending' :
                           order.status === 'pending' ? 'Processing' :
                             order.status.charAt(0).toUpperCase() + order.status.slice(1);
+                        
+                        const filteredOrders = orders.filter(o => o.order_items.length > 0);
+                        const displayNumber = getOrderDisplayNumber(index, filteredOrders.length);
 
                         return (
                           <div key={order.id} className="border rounded-lg p-4">
                             <div className="flex justify-between items-start mb-2">
                               <div>
-                                <p className="font-semibold">Order #{order.id.slice(0, 8)}</p>
+                                <p className="font-semibold">Order #{displayNumber}</p>
                                 <p className="text-sm text-muted-foreground">
                                   {new Date(order.created_at).toLocaleDateString()}
                                 </p>
