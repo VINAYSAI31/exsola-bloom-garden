@@ -69,7 +69,7 @@ const Checkout = () => {
         if (!error && data) {
             const shippingSetting = data.find(s => s.key === "shipping_charge");
             const thresholdSetting = data.find(s => s.key === "free_shipping_threshold");
-            
+
             if (shippingSetting) setShippingCharge(parseFloat(shippingSetting.value));
             if (thresholdSetting) setFreeShippingThreshold(parseFloat(thresholdSetting.value));
         }
@@ -233,73 +233,97 @@ const Checkout = () => {
 
             // 4. Handle Payment
             if (formData.payment_method === 'online') {
-                const options = {
-                    key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Use environment variable
-                    amount: Math.round(totalAmount * 100), // Amount in paise
-                    currency: "INR",
-                    name: "Exsola",
-                    description: "Purchase from Exsola",
-                    order_id: "", // In a real backend, you'd generate this from Razorpay API
-                    handler: async function (response: any) {
-                        // Payment Success
-                        try {
-                            const { data, error } = await supabase.functions.invoke('order-confirmation', {
-                                body: {
-                                    order_id: orderData.id,
-                                    payment_id: response.razorpay_payment_id,
-                                    payment_method: "online"
-                                }
-                            });
-
-                            if (error) throw error;
-
-                            finalizeOrder(orderData.id);
-                        } catch (err: any) {
-                            console.error("Verification failed", err);
-                            toast({
-                                title: "Payment Verification Failed",
-                                description: "We received your payment but failed to verify it automatically. Please contact support.",
-                                variant: "destructive"
-                            });
-                            // Still finalize locally so user isn't stuck, admin checks later
-                            finalizeOrder(orderData.id);
+                try {
+                    // Create Razorpay Order via Edge Function
+                    const { data: rzpOrder, error: rzpError } = await supabase.functions.invoke('create-razorpay-order', {
+                        body: {
+                            amount: Math.round(totalAmount * 100), // Amount in paise
+                            currency: "INR",
+                            receipt: orderData.id
                         }
-                    },
-                    modal: {
-                        ondismiss: async function () {
-                            setProcessing(false);
-                            toast({
-                                title: "Payment Cancelled",
-                                description: "You cancelled the payment process.",
-                                variant: "default"
-                            });
+                    });
 
-                            // Cancel/Delete the pending order since payment was not completed
-                            await supabase.from("orders").delete().eq("id", orderData.id);
+                    if (rzpError) throw rzpError;
 
-                            navigate("/cart");
+                    const options = {
+                        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                        amount: rzpOrder.amount, // Use amount from server
+                        currency: rzpOrder.currency,
+                        name: "Exsola",
+                        description: "Purchase from Exsola",
+                        order_id: rzpOrder.id, // Use the generated Order ID
+                        handler: async function (response: any) {
+                            // Payment Success
+                            try {
+                                const { data, error } = await supabase.functions.invoke('order-confirmation', {
+                                    body: {
+                                        order_id: orderData.id,
+                                        payment_id: response.razorpay_payment_id,
+                                        payment_method: "online"
+                                    }
+                                });
+
+                                if (error) throw error;
+
+                                finalizeOrder(orderData.id);
+                            } catch (err: any) {
+                                console.error("Verification failed", err);
+                                toast({
+                                    title: "Payment Verification Failed",
+                                    description: "We received your payment but failed to verify it automatically. Please contact support.",
+                                    variant: "destructive"
+                                });
+                                // Still finalize locally so user isn't stuck, admin checks later
+                                finalizeOrder(orderData.id);
+                            }
+                        },
+                        modal: {
+                            ondismiss: async function () {
+                                setProcessing(false);
+                                toast({
+                                    title: "Payment Cancelled",
+                                    description: "You cancelled the payment process.",
+                                    variant: "default"
+                                });
+
+                                // Cancel/Delete the pending order since payment was not completed
+                                await supabase.from("orders").delete().eq("id", orderData.id);
+
+                                navigate("/cart");
+                            }
+                        },
+                        prefill: {
+                            name: formData.full_name,
+                            email: user.email,
+                            contact: "" // Could collect phone number
+                        },
+                        theme: {
+                            color: "#166534"
                         }
-                    },
-                    prefill: {
-                        name: formData.full_name,
-                        email: user.email,
-                        contact: "" // Could collect phone number
-                    },
-                    theme: {
-                        color: "#166534"
-                    }
-                };
+                    };
 
-                const rzp = new (window as any).Razorpay(options);
-                rzp.open();
-                rzp.on('payment.failed', function (response: any) {
+                    const rzp = new (window as any).Razorpay(options);
+                    rzp.on('payment.failed', function (response: any) {
+                        toast({
+                            title: "Payment Failed",
+                            description: response.error.description,
+                            variant: "destructive"
+                        });
+                        setProcessing(false);
+                    });
+                    rzp.open();
+
+                } catch (err: any) {
+                    console.error("Razorpay init error:", err);
                     toast({
-                        title: "Payment Failed",
-                        description: response.error.description,
+                        title: "Payment Initialization Failed",
+                        description: err.message || "Could not start payment. Please try again.",
                         variant: "destructive"
                     });
+                    // Rollback order
+                    await supabase.from("orders").delete().eq("id", orderData.id);
                     setProcessing(false);
-                });
+                }
             }
 
         } catch (error: any) {

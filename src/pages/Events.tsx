@@ -67,10 +67,6 @@ const Events = () => {
                   We Love Being Part of the Community
                 </h2>
                 <div className="space-y-6 text-muted-foreground">
-                  <p className="leading-relaxed">
-                    You may have seen us at some of the most lively and eco-conscious markets and popup events, 
-                    where we connect with people, share knowledge, and celebrate the world of mushrooms.
-                  </p>
                   
                   <div className="bg-primary/5 p-6 rounded-lg border border-border">
                     <h3 className="text-xl font-semibold mb-4 text-foreground">

@@ -65,7 +65,7 @@ const Contact = () => {
                     <Phone className="h-6 w-6 text-accent-foreground" />
                   </div>
                   <CardTitle>Call Us</CardTitle>
-                  <CardDescription>Mon-Fri 9am-6pm EST</CardDescription>
+                  <CardDescription>Mon-Fri 9am-6pm IST</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-foreground">+91 9492987157</p>
