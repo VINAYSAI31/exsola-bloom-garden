@@ -7,12 +7,17 @@ import ProductCard from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import useLaunchCountdown from "@/hooks/useLaunchCountdown";
+import LaunchCountdown from "@/components/LaunchCountdown";
+import LaunchCelebration from "@/components/LaunchCelebration";
 
 const Products = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const { timeLeft, isLaunched } = useLaunchCountdown();
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     AOS.init({
@@ -22,6 +27,13 @@ const Products = () => {
     });
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (!isLaunched) return;
+    setShowCelebration(true);
+    const timeout = setTimeout(() => setShowCelebration(false), 9000);
+    return () => clearTimeout(timeout);
+  }, [isLaunched]);
 
   useEffect(() => {
     applyFilters();
@@ -51,6 +63,7 @@ const Products = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <LaunchCelebration show={showCelebration} />
       <Navbar />
       <main className="flex-1">
         {/* Header */}
@@ -66,6 +79,15 @@ const Products = () => {
             >
               Explore our premium selection of organic mushrooms
             </p>
+
+            <div className="mt-6 max-w-3xl mx-auto">
+              <LaunchCountdown
+                timeLeft={timeLeft}
+                isLaunched={isLaunched}
+                label="Shop unlocks in"
+                variant="card"
+              />
+            </div>
 
             {/* Category Sections */}
             <div
@@ -131,42 +153,62 @@ const Products = () => {
         {/* Products Grid */}
         <section className="py-16 bg-card">
           <div className="container mx-auto px-4">
-            {loading ? (
-              <div className="flex justify-center items-center min-h-[400px]">
-                <Loader2 className="h-8 w-8 animate-spin text-accent" />
-              </div>
-            ) : filteredProducts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-                <div className="max-w-md mx-auto bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-12 border border-green-200">
-                  <div className="w-20 h-20 bg-green-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Clock className="w-10 h-10 text-white" />
-                  </div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Coming Soon</h2>
-                  <p className="text-gray-600 mb-6">
-                    {selectedCategories.length > 0
-                      ? `We're preparing amazing ${selectedCategories[0].toLowerCase()} products for you. Stay tuned for updates!`
-                      : "We're preparing amazing products for you. Stay tuned for updates!"
-                    }
-                  </p>
-                  <div className="flex items-center justify-center text-sm text-gray-500">
-                    <Clock className="w-4 h-4 mr-2" />
-                    Products coming soon
+            <div className="relative">
+              {!isLaunched && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center">
+                  <div className="bg-white/90 backdrop-blur-lg border border-green-200 rounded-2xl shadow-xl p-6 max-w-xl text-center space-y-3">
+                    <p className="text-lg font-semibold text-gray-900">
+                      Shop unlocks at 10:00 AM · Stay tuned!
+                    </p>
+                    <LaunchCountdown
+                      timeLeft={timeLeft}
+                      isLaunched={isLaunched}
+                      label="Come back in"
+                      variant="overlay"
+                    />
                   </div>
                 </div>
+              )}
+
+              <div className={!isLaunched ? "opacity-40 pointer-events-none select-none" : ""}>
+                {loading ? (
+                  <div className="flex justify-center items-center min-h-[400px]">
+                    <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                  </div>
+                ) : filteredProducts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+                    <div className="max-w-md mx-auto bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-12 border border-green-200">
+                      <div className="w-20 h-20 bg-green-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Clock className="w-10 h-10 text-white" />
+                      </div>
+                      <h2 className="text-3xl font-bold text-gray-900 mb-4">Coming Soon</h2>
+                      <p className="text-gray-600 mb-6">
+                        {selectedCategories.length > 0
+                          ? `We're preparing amazing ${selectedCategories[0].toLowerCase()} products for you. Stay tuned for updates!`
+                          : "We're preparing amazing products for you. Stay tuned for updates!"
+                        }
+                      </p>
+                      <div className="flex items-center justify-center text-sm text-gray-500">
+                        <Clock className="w-4 h-4 mr-2" />
+                        Products coming soon
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">{filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      id={product.id}
+                      name={product.name}
+                      price={product.price}
+                      image={product.image_url}
+                      description={product.description}
+                    />
+                  ))}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">{filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  price={product.price}
-                  image={product.image_url}
-                  description={product.description}
-                />
-              ))}
-              </div>
-            )}
+            </div>
           </div>
         </section>
       </main>

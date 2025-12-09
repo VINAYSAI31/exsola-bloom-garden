@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Navbar from "@/components/Navbar";
@@ -13,6 +13,9 @@ import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import useLaunchCountdown from "@/hooks/useLaunchCountdown";
+import LaunchCountdown from "@/components/LaunchCountdown";
+import LaunchCelebration from "@/components/LaunchCelebration";
 import {
   ChevronRight,
   Star,
@@ -33,6 +36,9 @@ const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { timeLeft, isLaunched } = useLaunchCountdown();
+  const [showCelebration, setShowCelebration] = useState(false);
+
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -41,6 +47,13 @@ const Index = () => {
     });
     fetchFeaturedProducts();
   }, []);
+
+  useEffect(() => {
+    if (!isLaunched) return;
+    setShowCelebration(true);
+    const timeout = setTimeout(() => setShowCelebration(false), 9000);
+    return () => clearTimeout(timeout);
+  }, [isLaunched]);
 
   const fetchFeaturedProducts = async () => {
     const { data, error } = await supabase
@@ -58,8 +71,17 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <LaunchCelebration show={showCelebration} />
       <Navbar />
       <main className="flex-1">
+        <section className="px-4 sm:px-6 lg:px-8 pt-6">
+          <LaunchCountdown
+            timeLeft={timeLeft}
+            isLaunched={isLaunched}
+            label="Launch day unlocks soon"
+            variant="banner"
+          />
+        </section>
         <HeroSection />
         <FeaturedSection />
 

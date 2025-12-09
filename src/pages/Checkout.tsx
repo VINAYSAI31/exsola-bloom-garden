@@ -246,7 +246,8 @@ const Checkout = () => {
                             const { data, error } = await supabase.functions.invoke('order-confirmation', {
                                 body: {
                                     order_id: orderData.id,
-                                    payment_id: response.razorpay_payment_id
+                                    payment_id: response.razorpay_payment_id,
+                                    payment_method: "online"
                                 }
                             });
 
