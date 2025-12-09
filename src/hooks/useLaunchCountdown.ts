@@ -8,7 +8,7 @@ export type LaunchTimeLeft = {
 };
 
 // Target launch: Dec 10, 2025 10:00 AM IST (UTC+05:30)
-export const LAUNCH_DATETIME = "2025-12-09T10:00:00+05:30";
+export const LAUNCH_DATETIME = "2025-12-10T10:00:00+05:30";
 
 const getTimeLeft = (target: number): LaunchTimeLeft => {
   const diff = target - Date.now();
