@@ -59,7 +59,7 @@ const Events = () => {
         </section>
 
         {/* Introduction Section */}
-        <section className="py-16 bg-card">
+        {/* <section className="py-16 bg-card">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="prose prose-lg max-w-none">
@@ -91,7 +91,7 @@ const Events = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Events Grid */}
         <section className="py-16">
