@@ -214,6 +214,7 @@ export type Database = {
       orders: {
         Row: {
           created_at: string | null
+          dispatched: boolean | null
           id: string
           razorpay_order_id: string | null
           status: string | null
@@ -222,6 +223,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          dispatched?: boolean | null
           id?: string
           razorpay_order_id?: string | null
           status?: string | null
@@ -230,6 +232,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          dispatched?: boolean | null
           id?: string
           razorpay_order_id?: string | null
           status?: string | null

@@ -1,11 +1,22 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Eye } from "lucide-react";
+import { Eye, CheckCircle2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
+
+interface Address {
+  id: string;
+  street: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+  label?: string;
+  is_default: boolean;
+}
 
 interface Order {
   id: string;
@@ -13,10 +24,12 @@ interface Order {
   total: number;
   status: string;
   created_at: string;
+  dispatched?: boolean;
   profiles: {
     full_name: string;
     email: string;
   };
+  address?: Address;
 }
 
 interface OrderItem {
@@ -56,13 +69,36 @@ const AdminOrders = () => {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setOrders(data as any);
+      // Fetch addresses for each order's user
+      const ordersWithAddresses = await Promise.all(
+        data.map(async (order: any) => {
+          // Get user's default address or most recent address
+          const { data: addresses } = await supabase
+            .from("addresses")
+            .select("*")
+            .eq("user_id", order.user_id)
+            .order("is_default", { ascending: false })
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          return {
+            ...order,
+            dispatched: order.dispatched ?? false,
+            address: addresses || undefined
+          };
+        })
+      );
+
+      setOrders(ordersWithAddresses);
     }
     setLoading(false);
   };
 
   const handleViewOrder = async (order: Order) => {
     setSelectedOrder(order);
+    
+    // Fetch order items
     const { data, error } = await supabase
       .from("order_items")
       .select(`
@@ -77,7 +113,47 @@ const AdminOrders = () => {
     if (!error && data) {
       setOrderItems(data as any);
     }
+
+    // Fetch address if not already loaded
+    if (!order.address) {
+      const { data: addressData } = await supabase
+        .from("addresses")
+        .select("*")
+        .eq("user_id", order.user_id)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (addressData) {
+        setSelectedOrder({ ...order, address: addressData });
+      }
+    }
+
     setIsDialogOpen(true);
+  };
+
+  const handleToggleDispatched = async (order: Order) => {
+    const newDispatchedStatus = !order.dispatched;
+    
+    // Update local state immediately for better UX
+    setOrders(orders.map(o => 
+      o.id === order.id ? { ...o, dispatched: newDispatchedStatus } : o
+    ));
+
+    // Update in database
+    const { error } = await supabase
+      .from("orders")
+      .update({ dispatched: newDispatchedStatus } as any)
+      .eq("id", order.id);
+
+    if (error) {
+      console.error("Error updating dispatched status:", error);
+      // Revert local state on error
+      setOrders(orders.map(o => 
+        o.id === order.id ? { ...o, dispatched: order.dispatched } : o
+      ));
+    }
   };
 
   const filteredOrders = orders.filter((o) =>
@@ -111,22 +187,24 @@ const AdminOrders = () => {
               <TableRow>
                 <TableHead>Order ID</TableHead>
                 <TableHead>Customer</TableHead>
+                <TableHead>Delivery Address</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead className="text-center">Dispatched</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
+                  <TableCell colSpan={8} className="text-center">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : filteredOrders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
+                  <TableCell colSpan={8} className="text-center">
                     No orders found
                   </TableCell>
                 </TableRow>
@@ -144,6 +222,24 @@ const AdminOrders = () => {
                         </p>
                       </div>
                     </TableCell>
+                    <TableCell>
+                      {order.address ? (
+                        <div className="text-sm max-w-xs">
+                          <div className="flex items-start gap-1 mb-1">
+                            <MapPin className="h-3 w-3 mt-0.5 text-muted-foreground flex-shrink-0" />
+                            <div>
+                              <p className="font-medium">{order.address.street}</p>
+                              <p className="text-muted-foreground">
+                                {order.address.city}, {order.address.state} - {order.address.zip_code}
+                              </p>
+                              <p className="text-muted-foreground text-xs">{order.address.country}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">No address</span>
+                      )}
+                    </TableCell>
                     <TableCell className="font-semibold">
                       ₹{order.total.toFixed(2)}
                     </TableCell>
@@ -154,6 +250,23 @@ const AdminOrders = () => {
                     </TableCell>
                     <TableCell>
                       {new Date(order.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleToggleDispatched(order)}
+                        className="hover:bg-transparent"
+                        title={order.dispatched ? "Mark as not dispatched" : "Mark as dispatched"}
+                      >
+                        <CheckCircle2 
+                          className={`h-8 w-8 transition-colors ${
+                            order.dispatched 
+                              ? "text-green-600" 
+                              : "text-yellow-500"
+                          }`} 
+                        />
+                      </Button>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
@@ -202,6 +315,29 @@ const AdminOrders = () => {
                   <p className="text-sm">{selectedOrder.status}</p>
                 </div>
               </div>
+
+              {selectedOrder.address && (
+                <div className="border-t pt-4">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-semibold mb-2">Delivery Address</p>
+                      <div className="text-sm space-y-1">
+                        <p className="font-medium">{selectedOrder.address.street}</p>
+                        <p className="text-muted-foreground">
+                          {selectedOrder.address.city}, {selectedOrder.address.state} - {selectedOrder.address.zip_code}
+                        </p>
+                        <p className="text-muted-foreground">{selectedOrder.address.country}</p>
+                        {selectedOrder.address.label && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Label: {selectedOrder.address.label}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <h3 className="font-semibold mb-2">Order Items</h3>
