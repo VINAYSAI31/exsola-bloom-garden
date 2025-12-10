@@ -51,6 +51,7 @@ const Checkout = () => {
 
     const [formData, setFormData] = useState({
         full_name: "",
+        phone: "",
         street: "",
         city: "",
         state: "",
@@ -319,7 +320,8 @@ const Checkout = () => {
             const orderDataToInsert: any = {
                 user_id: user.id,
                 status: 'pending_payment',
-                total: totalAmount
+                total: totalAmount,
+                phone: formData.phone
             };
 
             // Add coupon info if applied
@@ -420,7 +422,7 @@ const Checkout = () => {
                         prefill: {
                             name: formData.full_name,
                             email: user.email,
-                            contact: "" // Could collect phone number
+                            contact: formData.phone
                         },
                         theme: {
                             color: "#166534"
@@ -630,6 +632,21 @@ const Checkout = () => {
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* Phone Number - Required for all orders */}
+                                    <div className="border-t pt-4">
+                                        <Label htmlFor="phone" className="text-lg font-semibold">Phone Number *</Label>
+                                        <Input
+                                            id="phone"
+                                            type="tel"
+                                            required
+                                            value={formData.phone}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter your phone number"
+                                            className="mt-2"
+                                        />
+                                        <p className="text-sm text-muted-foreground mt-1">Required for delivery updates</p>
+                                    </div>
 
                                     {/* Payment Method */}
                                     <div className="space-y-4 border-t pt-4">
