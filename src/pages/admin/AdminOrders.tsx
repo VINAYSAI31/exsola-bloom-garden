@@ -28,6 +28,7 @@ interface Order {
   profiles: {
     full_name: string;
     email: string;
+    phone: string;
   };
   address?: Address;
 }
@@ -63,7 +64,8 @@ const AdminOrders = () => {
         *,
         profiles:user_id (
           full_name,
-          email
+          email,
+          phone
         )
       `)
       .order("created_at", { ascending: false });
@@ -220,6 +222,11 @@ const AdminOrders = () => {
                         <p className="text-sm text-muted-foreground">
                           {order.profiles?.email || "N/A"}
                         </p>
+                        {order.profiles?.phone && (
+                          <p className="text-sm text-muted-foreground">
+                            📞 {order.profiles.phone}
+                          </p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -309,6 +316,11 @@ const AdminOrders = () => {
                   <p className="text-xs text-muted-foreground">
                     {selectedOrder.profiles?.email || "N/A"}
                   </p>
+                  {selectedOrder.profiles?.phone && (
+                    <p className="text-xs text-muted-foreground">
+                      📞 {selectedOrder.profiles.phone}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Status</p>
