@@ -267,6 +267,7 @@ export type Database = {
           dispatched: boolean | null
           id: string
           payment_id: string | null
+          phone: string | null
           razorpay_order_id: string | null
           status: string | null
           total: number
@@ -279,6 +280,7 @@ export type Database = {
           dispatched?: boolean | null
           id?: string
           payment_id?: string | null
+          phone?: string | null
           razorpay_order_id?: string | null
           status?: string | null
           total: number
@@ -291,6 +293,7 @@ export type Database = {
           dispatched?: boolean | null
           id?: string
           payment_id?: string | null
+          phone?: string | null
           razorpay_order_id?: string | null
           status?: string | null
           total?: number

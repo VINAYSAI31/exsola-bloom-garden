@@ -25,6 +25,7 @@ interface Order {
   status: string;
   created_at: string;
   dispatched?: boolean;
+  phone?: string;
   profiles: {
     full_name: string;
     email: string;
@@ -222,9 +223,9 @@ const AdminOrders = () => {
                         <p className="text-sm text-muted-foreground">
                           {order.profiles?.email || "N/A"}
                         </p>
-                        {order.profiles?.phone && (
-                          <p className="text-sm text-muted-foreground">
-                            📞 {order.profiles.phone}
+                        {order.phone && (
+                          <p className="text-sm font-medium text-green-600">
+                            📞 {order.phone}
                           </p>
                         )}
                       </div>
@@ -316,9 +317,9 @@ const AdminOrders = () => {
                   <p className="text-xs text-muted-foreground">
                     {selectedOrder.profiles?.email || "N/A"}
                   </p>
-                  {selectedOrder.profiles?.phone && (
-                    <p className="text-xs text-muted-foreground">
-                      📞 {selectedOrder.profiles.phone}
+                  {selectedOrder.phone && (
+                    <p className="text-sm font-medium text-green-600">
+                      📞 {selectedOrder.phone}
                     </p>
                   )}
                 </div>
