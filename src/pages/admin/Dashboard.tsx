@@ -22,9 +22,9 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
 
-    // Fetch total stats
+    // Fetch total stats - only count confirmed orders (not pending_payment)
     const [ordersRes, productsRes, usersRes] = await Promise.all([
-      supabase.from("orders").select("total"),
+      supabase.from("orders").select("total, status").neq("status", "pending_payment"),
       supabase.from("products").select("id"),
       supabase.from("profiles").select("id"),
     ]);
