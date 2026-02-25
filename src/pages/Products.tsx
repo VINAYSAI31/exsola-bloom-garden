@@ -43,7 +43,7 @@ const Products = () => {
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .eq("in_stock", true);
+      .order("in_stock", { ascending: false });
 
     if (!error && data) {
       setProducts(data);
@@ -204,6 +204,7 @@ const Products = () => {
                         price={product.price}
                         image={product.image_url}
                         description={product.description}
+                        inStock={product.in_stock}
                       />
                     ))}
                   </div>

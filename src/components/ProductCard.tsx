@@ -12,28 +12,32 @@ interface ProductCardProps {
   price: number;
   image: string;
   description: string;
-
+  inStock?: boolean;
 }
 
-const ProductCard = ({ id, name, price, image, description }: ProductCardProps) => {
+const ProductCard = ({ id, name, price, image, description, inStock = true }: ProductCardProps) => {
   const { toast } = useToast();
-
   const navigate = useNavigate();
 
   const handleViewDetails = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent parent Link from triggering if nested
+    e.preventDefault();
     navigate(`/products/${id}`);
   };
 
   return (
     <Link to={`/products/${id}`} className="block h-full">
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group h-full flex flex-col">
-        <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center">
+      <div className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group h-full flex flex-col ${!inStock ? 'opacity-75' : ''}`}>
+        <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center relative">
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+            className={`w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300 ${!inStock ? 'grayscale-[30%]' : ''}`}
           />
+          {!inStock && (
+            <div className="absolute top-2 right-2 bg-red-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-full">
+              Out of Stock
+            </div>
+          )}
         </div>
         <div className="p-4 sm:p-6 flex flex-col flex-1">
           <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-2 group-hover:text-green-800 transition-colors line-clamp-2">
@@ -43,10 +47,14 @@ const ProductCard = ({ id, name, price, image, description }: ProductCardProps) 
           <div className="mt-auto">
             <p className="text-lg sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">₹{price.toFixed(2)}</p>
             <div
-              className="w-full bg-green-800 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-semibold hover:bg-green-900 transition-colors flex items-center justify-center cursor-pointer"
+              className={`w-full px-4 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center cursor-pointer ${
+                inStock
+                  ? 'bg-green-800 text-white hover:bg-green-900'
+                  : 'bg-gray-400 text-white cursor-not-allowed'
+              }`}
             >
               <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-              View Details
+              {inStock ? 'View Details' : 'Out of Stock'}
             </div>
           </div>
         </div>
